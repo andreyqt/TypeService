@@ -26,7 +26,10 @@ public class RestClientConfig {
     public RestClient restClient() {
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeaders(header -> header.add("Authorization", apeKey))
+                .defaultHeaders(header -> {
+                    header.add("Authorization", apeKey);
+                    header.add("Content-Type", "application/json");
+                })
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, handleClientError())
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, handleServerError())
                 .defaultStatusHandler(HttpStatusCode::is2xxSuccessful, handleSuccess())
@@ -39,7 +42,6 @@ public class RestClientConfig {
             String statusText = response.getStatusText();
             log.error("Request failed! \n method: {} \n uri: {} \n code: {}, {} \n timestamp: {}",
                     request.getMethod(), request.getURI(), statusCode, statusText, LocalDateTime.now());
-            throw new HttpClientErrorException(statusCode, statusText);
         };
     }
 
@@ -50,7 +52,6 @@ public class RestClientConfig {
             log.error("Server failed to complete request! \n code: {}, text: {} \n timestamp: {}",
                     statusCode, statusText, LocalDateTime.now()
             );
-            throw new HttpServerErrorException(statusCode, statusText);
         };
     }
 
