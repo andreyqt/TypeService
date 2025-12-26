@@ -55,9 +55,8 @@ public class RestClientConfig {
     }
 
     public RestClient.ResponseSpec.ErrorHandler handleSuccess() {
-        return (request, _) -> {
-            log.info("Made successful request! \n method: {} \n uri: {}", request.getMethod(), request.getURI());
-        };
+        return (request, _) -> log.info("Made successful request! \n method: {} \n uri: {}",
+                request.getMethod(), request.getURI());
     }
 
 }
