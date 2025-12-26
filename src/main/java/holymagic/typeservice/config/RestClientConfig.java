@@ -26,9 +26,7 @@ public class RestClientConfig {
     public RestClient restClient() {
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeaders(header -> {
-                    header.add("Authorization", apeKey);
-                })
+                .defaultHeaders(header -> header.add("Authorization", apeKey))
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, handleClientError())
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, handleServerError())
                 .defaultStatusHandler(HttpStatusCode::is2xxSuccessful, handleSuccess())
