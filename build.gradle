@@ -31,6 +31,7 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jersey'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'org.projectlombok:lombok'
 
