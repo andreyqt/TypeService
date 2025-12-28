@@ -1,6 +1,11 @@
 package holymagic.typeservice.model;
 
 import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.user.CheckName;
+import holymagic.typeservice.model.user.CurrentTestActivity;
+import holymagic.typeservice.model.user.Profile;
+import holymagic.typeservice.model.user.Stats;
+import holymagic.typeservice.model.user.Streak;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.List;
@@ -15,5 +20,17 @@ public class ParameterizedTypeReferences {
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<List<PersonalBest>>> LIST_OF_RECORDS =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<Stats>> STATS_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<Profile>> PROFILE_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<CurrentTestActivity>> CURRENT_TEST_ACTIVITY_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<Streak>> STREAK_REF =
             new ParameterizedTypeReference<>() {};
 }

@@ -1,19 +1,20 @@
 package holymagic.typeservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
-public class PersonalBestDto {
-    private Double accuracy;
-    private Double speed;
-    private String language;
-    private Boolean punctuation;
-    private Boolean numbers;
+@AllArgsConstructor
+@NoArgsConstructor
+public class CurrentTestActivityDto {
+    private List<Integer> testsByDays;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime localDateTime;
+    private LocalDateTime lastDay;
 }

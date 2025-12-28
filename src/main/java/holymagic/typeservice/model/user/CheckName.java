@@ -1,4 +1,4 @@
-package holymagic.typeservice.model;
+package holymagic.typeservice.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -6,6 +6,7 @@ import holymagic.typeservice.mapper.CheckNameMapper;
 import holymagic.typeservice.mapper.CheckNameMapperImpl;
 import holymagic.typeservice.mapper.PersonalBestMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
+import holymagic.typeservice.model.user.Stats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import java.util.Map;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RECORDS;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_LIST_OF_RECORDS;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.STATS_REF;
 import static holymagic.typeservice.service.UserServiceTestData.CHECK_NAME_RESPONSE;
 import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_CHECK_NAME_DTO;
 import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_CHECK_NAME_URI;
@@ -32,9 +34,11 @@ import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_DTO_MAP
 import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_DTO_RECORDS_FOR_30S;
 import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_GET_PERSONAL_BEST_30S_URI;
 import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_GET_PERSONAL_BEST_URI;
+import static holymagic.typeservice.service.UserServiceTestData.EXPECTED_GET_STATS_URI;
 import static holymagic.typeservice.service.UserServiceTestData.LIST_OF_RECORDS_RESPONSE_FOR_30S;
 import static holymagic.typeservice.service.UserServiceTestData.MAP_OF_LIST_OF_RECORDS_RESPONSE;
 import static holymagic.typeservice.service.UserServiceTestData.NAME_TO_CHECK;
+import static holymagic.typeservice.service.UserServiceTestData.STATS_RESPONSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -115,5 +119,19 @@ public class UserServiceTest {
         assertEquals(EXPECTED_GET_PERSONAL_BEST_30S_URI, capturedUri);
         assertEquals("time", actualComponents.getQueryParams().getFirst("mode"));
         assertEquals("30", actualComponents.getQueryParams().getFirst("mode2"));
+    }
+
+    @Test
+    public void getStatsTest() {
+        when(responseSpec.body(STATS_REF)).thenReturn(STATS_RESPONSE);
+        Stats actualStats = userService.getStats();
+
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        verify(requestHeadersSpec).retrieve();
+        verify(responseSpec).body(STATS_REF);
+
+        URI capturedUri = uriCaptor.getValue();
+        assertEquals(EXPECTED_GET_STATS_URI, capturedUri);
     }
 }

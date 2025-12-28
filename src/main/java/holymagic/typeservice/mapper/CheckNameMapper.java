@@ -1,7 +1,7 @@
 package holymagic.typeservice.mapper;
 
 import holymagic.typeservice.dto.CheckNameDto;
-import holymagic.typeservice.model.CheckName;
+import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.Response;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

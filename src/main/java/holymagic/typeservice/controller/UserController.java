@@ -1,7 +1,11 @@
 package holymagic.typeservice.controller;
 
 import holymagic.typeservice.dto.CheckNameDto;
+import holymagic.typeservice.dto.CurrentTestActivityDto;
 import holymagic.typeservice.dto.PersonalBestDto;
+import holymagic.typeservice.dto.StreakDto;
+import holymagic.typeservice.model.user.Profile;
+import holymagic.typeservice.model.user.Stats;
 import holymagic.typeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +37,26 @@ public class UserController {
     public ResponseEntity<List<PersonalBestDto>> getPersonalBests(@PathVariable String mode,
                                                                   @PathVariable String mode2) {
         return ResponseEntity.ok(userService.getPersonalBests(mode, mode2));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Stats> getStats() {
+        return ResponseEntity.ok(userService.getStats());
+    }
+
+    @GetMapping("/profile/{name}")
+    public ResponseEntity<Profile> getProfile(@PathVariable String name) {
+        return ResponseEntity.ok(userService.getProfile(name));
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<CurrentTestActivityDto> getCurrentTestActivity() {
+        return ResponseEntity.ok(userService.getCurrentTestActivity());
+    }
+
+    @GetMapping("/streak")
+    public ResponseEntity<StreakDto> getStreak() {
+        return ResponseEntity.ok(userService.getStreak());
     }
 
 }

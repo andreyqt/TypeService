@@ -4,8 +4,9 @@ import holymagic.typeservice.dto.CheckNameDto;
 import holymagic.typeservice.dto.PersonalBestDto;
 import holymagic.typeservice.mapper.PersonalBestMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
-import holymagic.typeservice.model.CheckName;
+import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.Response;
+import holymagic.typeservice.model.user.Stats;
 import holymagic.typeservice.model.race.PersonalBest;
 
 import java.net.URI;
@@ -21,6 +22,8 @@ public class UserServiceTestData {
             new Response<>("test message", List.of(providePersonalBestsForTimeMode().get(1)));
     public static final Response<Map<String, List<PersonalBest>>> MAP_OF_LIST_OF_RECORDS_RESPONSE =
             new Response<>("test message", providePersonalBests());
+    public static final Response<Stats> STATS_RESPONSE = new Response<>("test message",
+            new Stats("test_id", 10000, 10070, 500.));
 
     public static final CheckNameDto EXPECTED_CHECK_NAME_DTO =
             new CheckNameDto("test message", true);
@@ -32,6 +35,7 @@ public class UserServiceTestData {
     public static final URI EXPECTED_CHECK_NAME_URI = URI.create("users/checkName/test_name");
     public static final URI EXPECTED_GET_PERSONAL_BEST_URI = URI.create("/users/personalBests?mode=time");
     public static final URI EXPECTED_GET_PERSONAL_BEST_30S_URI = URI.create("/users/personalBests?mode=time&mode2=30");
+    public static final URI EXPECTED_GET_STATS_URI = URI.create("/users/stats");
 
     public static List<PersonalBest> providePersonalBestsForTimeMode() {
         PersonalBest pb15s = PersonalBest.builder()
