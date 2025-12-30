@@ -1,6 +1,7 @@
 package holymagic.typeservice.model;
 
 import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
@@ -33,4 +34,10 @@ public class ParameterizedTypeReferences {
 
     public static final ParameterizedTypeReference<Response<Streak>> STREAK_REF =
             new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<List<Race>>> LIST_OF_RACES_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<Race>> RACE_REF
+            = new ParameterizedTypeReference<>() {};
 }
