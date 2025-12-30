@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonalBestMapperTest {
+
     PersonalBestMapper personalBestMapper;
     PersonalBest testPersonalBest;
     PersonalBestDto testPersonalBestDto;
