@@ -8,12 +8,14 @@ import holymagic.typeservice.mapper.CheckNameMapper;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapper;
 import holymagic.typeservice.mapper.StreakMapper;
+import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.Response;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.Stats;
 import holymagic.typeservice.model.user.Streak;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,12 +57,15 @@ public class UserService {
         URI uri = UriBuilder.fromPath("/users/personalBests")
                 .queryParam("mode", mode)
                 .build();
-        return restClient.get()
+        Map<String, List<PersonalBest>> bpMap = restClient.get()
                 .uri(uri)
                 .retrieve()
                 .body(MAP_OF_LIST_OF_RECORDS)
-                .getData()
-                .entrySet()
+                .getData();
+        if (bpMap == null) {
+            throw new NotFoundException("pb for mode \"" + mode + "\" not found");
+        }
+        return bpMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -73,12 +78,15 @@ public class UserService {
                 .queryParam("mode", mode)
                 .queryParam("mode2", mode2)
                 .build();
-        return restClient.get()
+        List<PersonalBest> pbs = restClient.get()
                 .uri(uri)
                 .retrieve()
                 .body(LIST_OF_RECORDS)
-                .getData()
-                .stream()
+                .getData();
+        if (pbs == null) {
+            throw new NotFoundException("pb for mode \"" + mode + "\" and mode2: \"" + mode2 + "\" not found");
+        }
+        return pbs.stream()
                 .map(personalBestMapper::toDto)
                 .toList();
     }

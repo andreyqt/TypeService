@@ -51,7 +51,7 @@ public class RaceService {
                 .retrieve()
                 .body(RACE_REF)
                 .getData();
-        if (race == null) {
+        if (race == null || race.getId() == null) {
             throw new NotFoundException("race was not found");
         }
         return raceMapper.toDto(race);
@@ -65,7 +65,7 @@ public class RaceService {
                 .retrieve()
                 .body(RACE_REF)
                 .getData();
-        if (race == null) {
+        if (race == null || race.getId() == null) {
             throw new NotFoundException("race was not found");
         }
         return raceMapper.toDto(race);
