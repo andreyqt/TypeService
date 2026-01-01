@@ -22,8 +22,8 @@ public class PublicDataServiceTestData {
 
     public static Response<TypingStats> provideTypingStatsResponse() {
         TypingStats stats = TypingStats.builder()
-                .testsCompleted(100)
-                .testsStarted(120)
+                .testsCompleted(100L)
+                .testsStarted(120L)
                 .timeTyping(5.)
                 .build();
         return new Response<>("test message", stats);
