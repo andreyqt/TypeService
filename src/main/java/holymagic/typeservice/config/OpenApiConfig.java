@@ -27,7 +27,7 @@ public class OpenApiConfig {
                         API gives access to:
                         1) user account data;
                         2) user test results;
-                        3) Public endpoints...
+                        3) Public data.
                         """
                         )
                         .contact(new Contact()
