@@ -54,7 +54,7 @@ public class PublicDataServiceTest {
     public void getSpeedHistogramTest() {
         Response<Map<String, Integer>> response = PublicDataServiceTestData.provideHistogramResponse();
         when(responseSpec.body(SPEED_HISTOGRAM_REF)).thenReturn(response);
-        doNothing().when(publicDataValidator).validateGetHistogramArgs(anyString(), anyString(), anyString());
+        doNothing().when(publicDataValidator).validatePublicDataArgs(anyString(), anyString(), anyString());
         Map<String, Integer> speedHistogram =
                 publicDataService.getSpeedHistogram("english", "time", "60");
 

@@ -21,7 +21,7 @@ public class PublicDataValidatorTest {
     @MethodSource("validLanguages")
     public void validateGetHistogramLanguageArgTest(String input) {
         assertDoesNotThrow(() -> {
-            validator.validateGetHistogramArgs(input, "time", "15");
+            validator.validatePublicDataArgs(input, "time", "15");
         });
     }
 
@@ -29,7 +29,7 @@ public class PublicDataValidatorTest {
     @MethodSource("invalidLanguages")
     public void validateGetHistogramLanguageInvalidArgTest(String input) {
         assertThrows(IllegalArgumentException.class, () -> {
-            validator.validateGetHistogramArgs(input, "time", "15");
+            validator.validatePublicDataArgs(input, "time", "15");
         });
     }
 
@@ -37,7 +37,7 @@ public class PublicDataValidatorTest {
     @MethodSource("provideValidModeCombinations")
     public void validateGetHistogramModeCombinationTest(String mode, String mode2) {
         assertDoesNotThrow(() -> {
-            validator.validateGetHistogramArgs("english", mode, mode2);
+            validator.validatePublicDataArgs("english", mode, mode2);
         });
     }
 
@@ -45,7 +45,7 @@ public class PublicDataValidatorTest {
     @MethodSource("provideInvalidModeCombinations")
     public void validateGetHistogramModeInvalidModeTest(String mode, String mode2) {
         assertThrows(IllegalArgumentException.class, () -> {
-            validator.validateGetHistogramArgs("english", mode, mode2);
+            validator.validatePublicDataArgs("english", mode, mode2);
         });
     }
 

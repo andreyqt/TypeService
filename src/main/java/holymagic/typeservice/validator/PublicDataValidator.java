@@ -19,7 +19,7 @@ public class PublicDataValidator {
             "words", List.of("10", "25", "50", "100")
     );
 
-    public void validateGetHistogramArgs(String language, String mode, String mode2) {
+    public void validatePublicDataArgs(String language, String mode, String mode2) {
         if (!ALLOWED_LANGUAGES.contains(language)) {
             throw new IllegalArgumentException("can't provide information for given language: " + language);
         }

@@ -1,5 +1,6 @@
 package holymagic.typeservice.model;
 
+import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.publicData.TypingStats;
 import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.race.Race;
@@ -46,5 +47,8 @@ public class ParameterizedTypeReferences {
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<TypingStats>> TYPING_STATS_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Response<Leaderboard>> LEADERBOARD_REF =
             new ParameterizedTypeReference<>() {};
 }
