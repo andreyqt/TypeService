@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UserServiceTestData {
+
     public static final String NAME_TO_CHECK = "test_name";
 
     public static final Response<CheckName> CHECK_NAME_RESPONSE =

@@ -20,7 +20,7 @@ public class PublicDataService {
     private final PublicDataValidator publicDataValidator;
 
     public Map<String, Integer> getSpeedHistogram(String language, String mode, String mode2) {
-        publicDataValidator.validateGetHistogramArgs(language, mode, mode2);
+        publicDataValidator.validatePublicDataArgs(language, mode, mode2);
         URI uri = UriBuilder.fromPath("/public/speedHistogram")
                 .queryParam("language", language)
                 .queryParam("mode", mode)
@@ -42,4 +42,6 @@ public class PublicDataService {
                 .body(TYPING_STATS_REF)
                 .getData();
     }
+
+
 }

@@ -1,7 +1,7 @@
 package holymagic.typeservice.mapper;
 
-import holymagic.typeservice.dto.RaceDto;
-import holymagic.typeservice.model.race.Race;
+import holymagic.typeservice.dto.RankedRaceDto;
+import holymagic.typeservice.model.leaderboard.RankedRace;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -14,14 +14,13 @@ import java.time.ZoneId;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface RaceMapper {
+public interface RankedRaceMapper {
     @Mappings({
             @Mapping(source = "acc", target = "accuracy"),
             @Mapping(source = "wpm", target = "speed"),
-            @Mapping(source = "timestamp", target = "localDateTime", qualifiedByName = "mapLongToLocalDateTime"),
-            @Mapping(source = "charStats", target = "chars", qualifiedByName = "mapCharStatsToChars")
+            @Mapping(source = "timestamp", target = "localDateTime", qualifiedByName = "mapLongToLocalDateTime")
     })
-    RaceDto toDto(Race race);
+    RankedRaceDto toDto(RankedRace rankedRace);
 
     @Named("mapLongToLocalDateTime")
     default LocalDateTime mapLongToLocalDateTime(Long timestamp) {
@@ -29,12 +28,7 @@ public interface RaceMapper {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
-    @Named("mapCharStatsToChars")
-    default int mapCharStatsToChars(int[] charStats) {
-        return charStats[0];
-    }
-
-    default List<RaceDto> toDto(List<Race> races) {
-        return races.stream().map(this::toDto).toList();
+    default List<RankedRaceDto> toDto(List<RankedRace> rankedRaces) {
+        return rankedRaces.stream().map(this::toDto).toList();
     }
 }

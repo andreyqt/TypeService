@@ -71,7 +71,9 @@ public class RaceService {
         return raceMapper.toDto(race);
     }
 
-    private URI prepareGetResultsUri(Long onOrAfterTimestamp, Integer offset, Integer limit) {
+    private URI prepareGetResultsUri(@Nullable Long onOrAfterTimestamp,
+                                     @Nullable Integer offset,
+                                     @Nullable Integer limit) {
         UriBuilder builder = UriBuilder.fromPath("/results");
         if (onOrAfterTimestamp != null) {
             raceValidator.validateTimestamp(onOrAfterTimestamp);

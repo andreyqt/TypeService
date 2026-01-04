@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
@@ -54,18 +55,11 @@ public class PublicDataServiceTest {
     public void getSpeedHistogramTest() {
         Response<Map<String, Integer>> response = PublicDataServiceTestData.provideHistogramResponse();
         when(responseSpec.body(SPEED_HISTOGRAM_REF)).thenReturn(response);
-        doNothing().when(publicDataValidator).validateGetHistogramArgs(anyString(), anyString(), anyString());
+        doNothing().when(publicDataValidator).validatePublicDataArgs(anyString(), anyString(), anyString());
         Map<String, Integer> speedHistogram =
                 publicDataService.getSpeedHistogram("english", "time", "60");
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(SPEED_HISTOGRAM_REF);
         assertEquals(response.getData(), speedHistogram);
-
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_SPEED_HISTOGRAM_URI, capturedUri);
+        verifyRestClientActions(SPEED_HISTOGRAM_REF, EXPECTED_GET_SPEED_HISTOGRAM_URI);
     }
 
     @Test
@@ -73,15 +67,17 @@ public class PublicDataServiceTest {
         Response<TypingStats> response = PublicDataServiceTestData.provideTypingStatsResponse();
         when(responseSpec.body(TYPING_STATS_REF)).thenReturn(response);
         TypingStats actualStats = publicDataService.getTypingStats();
+        assertEquals(response.getData(), actualStats);
+        verifyRestClientActions(TYPING_STATS_REF, EXPECTED_GET_TYPING_STATS_URI);
+    }
 
+    public void verifyRestClientActions(ParameterizedTypeReference reference, URI expectedUri) {
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(uriCaptor.capture());
         verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(TYPING_STATS_REF);
-        assertEquals(response.getData(), actualStats);
-
+        verify(responseSpec).body(reference);
         URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_TYPING_STATS_URI, capturedUri);
+        assertEquals(expectedUri, capturedUri);
     }
 
 }

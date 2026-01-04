@@ -23,10 +23,10 @@ public class RaceServiceTestData {
     public static final List<RaceDto> EXPECTED_LIST_OF_DTO_RACES = provideListOfDtoRaces();
     public static final RaceDto EXPECTED_RACE_DTO = provideListOfDtoRaces().getFirst();
     public static final URI EXPECTED_GET_RESULTS_URI = URI.create("/results");
-    public static final URI EXPECTED_GET_RESULTS_WITH_PARAMS_URI =
-            URI.create("/results?onOrAfterTimestamp=1589428800000&offset=0&limit=3");
     public static final URI EXPECTED_GET_BY_ID_RESULT_URI = URI.create("/results/id/fi35d345");
     public static final URI EXPECTED_GET_LAST_RESULT_URI = URI.create("/results/last");
+    public static final URI EXPECTED_GET_RESULTS_WITH_PARAMS_URI =
+            URI.create("/results?onOrAfterTimestamp=1589428800000&offset=0&limit=3");
 
     public static List<Race> provideRaces() {
         Race race1 = Race.builder()
