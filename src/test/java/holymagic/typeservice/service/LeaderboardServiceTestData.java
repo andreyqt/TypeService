@@ -1,11 +1,16 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.dto.RankedRaceDto;
+import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.mapper.RankedRaceMapper;
 import holymagic.typeservice.mapper.RankedRaceMapperImpl;
+import holymagic.typeservice.mapper.WeeklyActivityMapper;
+import holymagic.typeservice.mapper.WeeklyActivityMapperImpl;
 import holymagic.typeservice.model.Response;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.model.leaderboard.WeeklyActivity;
+import holymagic.typeservice.model.leaderboard.XpLeaderboard;
 
 import java.net.URI;
 import java.util.List;
@@ -15,11 +20,20 @@ public class LeaderboardServiceTestData {
     public static String EXPECTED_NOT_FOUND_EXCEPTION_MSG = String.format(
             "could not get the leaderboard for args: language=%s, mode=%s, mode2=%s, page=%s, pageSize=%s, friendsOnly=%s",
             "english", "time", "60", null, null, null);
+    public static String EXPECTED_NOT_FOUND_EXCEPTION_RANK_MSG = String.format(
+            "could not get the rank for args: language=%s, mode=%s, mode2=%s, friendsOnly=%s",
+            "english", "time", "60", null);
 
     public static final URI EXPECTED_GET_LEADERBOARD_URI =
             URI.create("/leaderboards?language=english&mode=time&mode2=60");
+    public static final URI EXPECTED_GET_DAILY_LEADERBOARD_URI =
+            URI.create("/leaderboards/daily?language=english&mode=time&mode2=60");
     public static final URI EXPECTED_GET_LEADERBOARD_URI_WITH_ALL_PARAMS =
             URI.create("/leaderboards?language=english&mode=time&mode2=60&page=0&pageSize=3&friendsOnly=true");
+    public static final URI EXPECTED_GET_RANK_URI =
+            URI.create("/leaderboards/rank?language=english&mode=time&mode2=60");
+    public static final URI EXPECTED_GET_XP_LEADERBOARD_URI =
+            URI.create("/leaderboards/xp/weekly");
 
     public static final Response<Leaderboard> LEADERBOARD_RESPONSE =
             new Response<>("leaderboards retrieved", new Leaderboard(100, provideRankedRaces()));
@@ -27,6 +41,12 @@ public class LeaderboardServiceTestData {
             new Response<>("leaderboards retrieved", null);
     public static final Response<Leaderboard> LEADERBOARD_FRIENDS_ONLY_RESPONSE =
             new Response<>("leaderboards retrieved", new Leaderboard(3, provideRankedRacesForFriendsOnly()));
+    public static final Response<RankedRace> RANKED_RACE_RESPONSE =
+            new Response<>("rank retrieved", provideRankedRaces().getFirst());
+    public static final Response<RankedRace> RANKED_RACE_NULL_RESPONSE =
+            new Response<>("rank retrieved", null);
+    public static final Response<XpLeaderboard> XP_LEADERBOARD_RESPONSE =
+            new Response<>("xp leaderboards retrieved", new XpLeaderboard(3, provideWeeklyActivities()));
 
     public static List<RankedRace> provideRankedRaces() {
         RankedRace firstRace = RankedRace.builder()
@@ -120,4 +140,45 @@ public class LeaderboardServiceTestData {
         RankedRaceMapper mapper = new RankedRaceMapperImpl();
         return provideRankedRacesForFriendsOnly().stream().map(mapper::toDto).toList();
     }
+
+    public static RankedRaceDto provideRankedRaceDto() {
+        return provideRankedRacesDto().getFirst();
+    }
+
+    public static List<WeeklyActivity> provideWeeklyActivities() {
+        WeeklyActivity firstActivity = WeeklyActivity.builder()
+                .uid("3gjn3094")
+                .name("test_name")
+                .discordId("234g934593")
+                .discordAvatar("430-bn039h4g")
+                .totalXp(539523)
+                .rank(1)
+                .lastActivityTimestamp(1764536400000L)
+                .build();
+        WeeklyActivity secondActivity = WeeklyActivity.builder()
+                .uid("3gjn33094")
+                .name("test_name_1")
+                .discordId("2344g934593")
+                .discordAvatar("4330-bn039h4g")
+                .totalXp(539500)
+                .rank(2)
+                .lastActivityTimestamp(1764536410000L)
+                .build();
+        WeeklyActivity thirdActivity = WeeklyActivity.builder()
+                .uid("3gjn5094")
+                .name("test_name_2")
+                .discordId("2344g934593")
+                .discordAvatar("4330-bn039h4g")
+                .totalXp(538500)
+                .rank(3)
+                .lastActivityTimestamp(1764536420000L)
+                .build();
+        return List.of(firstActivity, secondActivity, thirdActivity);
+    }
+
+    public static List<WeeklyActivityDto> provideWeeklyActivitiesDto() {
+        WeeklyActivityMapper mapper = new WeeklyActivityMapperImpl();
+        return provideWeeklyActivities().stream().map(mapper::toDto).toList();
+    }
+
 }

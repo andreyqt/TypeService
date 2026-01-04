@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -75,63 +76,40 @@ public class UserServiceTest {
     public void checkNameTest() {
         when(responseSpec.body(CHECK_NAME_REF)).thenReturn(CHECK_NAME_RESPONSE);
         CheckNameDto actualCheckNameDto = userService.checkName(NAME_TO_CHECK);
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(CHECK_NAME_REF);
         assertEquals(EXPECTED_CHECK_NAME_DTO, actualCheckNameDto);
-
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_CHECK_NAME_URI, capturedUri);
+        verifyRestClientActions(CHECK_NAME_REF, EXPECTED_CHECK_NAME_URI);
     }
 
     @Test
     public void getPersonalTest() {
         when(responseSpec.body(MAP_OF_LIST_OF_RECORDS)).thenReturn(MAP_OF_LIST_OF_RECORDS_RESPONSE);
         Map<String, List<PersonalBestDto>> actualDtoMap = userService.getPersonalBests("time");
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(MAP_OF_LIST_OF_RECORDS);
         assertEquals(EXPECTED_DTO_MAP_OF_LIST_OF_RECORDS, actualDtoMap);
-
-        URI capturedUri = uriCaptor.getValue();
-        UriComponents actualComponents = UriComponentsBuilder.fromUri(capturedUri).build();
-        assertEquals(EXPECTED_GET_PERSONAL_BEST_URI, capturedUri);
-        assertEquals("time", actualComponents.getQueryParams().getFirst("mode"));
+        verifyRestClientActions(MAP_OF_LIST_OF_RECORDS, EXPECTED_GET_PERSONAL_BEST_URI);
     }
 
     @Test
     public void getPersonalBestForTimeTest() {
         when(responseSpec.body(LIST_OF_RECORDS)).thenReturn(LIST_OF_RECORDS_RESPONSE_FOR_30S);
         List<PersonalBestDto> actualDtoList = userService.getPersonalBests("time", "30");
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(LIST_OF_RECORDS);
+        verifyRestClientActions(LIST_OF_RECORDS, EXPECTED_GET_PERSONAL_BEST_30S_URI);
         assertEquals(EXPECTED_DTO_RECORDS_FOR_30S, actualDtoList);
-
-        URI capturedUri = uriCaptor.getValue();
-        UriComponents actualComponents = UriComponentsBuilder.fromUri(capturedUri).build();
-        assertEquals(EXPECTED_GET_PERSONAL_BEST_30S_URI, capturedUri);
-        assertEquals("time", actualComponents.getQueryParams().getFirst("mode"));
-        assertEquals("30", actualComponents.getQueryParams().getFirst("mode2"));
     }
 
     @Test
     public void getStatsTest() {
         when(responseSpec.body(STATS_REF)).thenReturn(STATS_RESPONSE);
         Stats actualStats = userService.getStats();
+        assertEquals(STATS_RESPONSE.getData(), actualStats);
+        verifyRestClientActions(STATS_REF, EXPECTED_GET_STATS_URI);
+    }
 
+    public void verifyRestClientActions(ParameterizedTypeReference reference, URI expectedUri) {
         verify(restClient).get();
         verify(requestHeadersUriSpec).uri(uriCaptor.capture());
         verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(STATS_REF);
-
+        verify(responseSpec).body(reference);
         URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_STATS_URI, capturedUri);
+        assertEquals(expectedUri, capturedUri);
     }
 }

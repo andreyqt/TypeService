@@ -14,9 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -36,7 +35,6 @@ import static holymagic.typeservice.service.RaceServiceTestData.SINGLE_RESPONSE_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,15 +69,8 @@ public class RaceServiceTest {
     public void getResultsWithNoParametersTest() {
         when(responseSpec.body(LIST_OF_RACES_REF)).thenReturn(RESPONSE_OF_RACES);
         List<RaceDto> actualListOfDtoRaces = raceService.getResults(null,null,null);
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(LIST_OF_RACES_REF);
-
+        verifyRestClientActions(LIST_OF_RACES_REF, EXPECTED_GET_RESULTS_URI);
         assertEquals(EXPECTED_LIST_OF_DTO_RACES, actualListOfDtoRaces);
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_RESULTS_URI, capturedUri);
     }
 
     @Test
@@ -94,41 +85,17 @@ public class RaceServiceTest {
     @DisplayName("when every arg is valid")
     public void getResultsWithValidParametersTest() {
         when(responseSpec.body(LIST_OF_RACES_REF)).thenReturn(RESPONSE_OF_RACES);
-        doNothing().when(raceValidator).validateLimit(any(Integer.class));
-        doNothing().when(raceValidator).validateOffset(any(Integer.class));
-        doNothing().when(raceValidator).validateTimestamp(any(Long.class));
-
         List<RaceDto> actualListOfDtoRaces = raceService.getResults(1589428800000L,0,3);
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(LIST_OF_RACES_REF);
-        verify(raceValidator).validateLimit(3);
-        verify(raceValidator).validateTimestamp(1589428800000L);
-        verify(raceValidator).validateOffset(0);
-
+        verifyRestClientActions(LIST_OF_RACES_REF, EXPECTED_GET_RESULTS_WITH_PARAMS_URI);
         assertEquals(EXPECTED_LIST_OF_DTO_RACES, actualListOfDtoRaces);
-        URI capturedUri = uriCaptor.getValue();
-        UriComponents actualUri = UriComponentsBuilder.fromUri(capturedUri).build();
-        assertEquals(EXPECTED_GET_RESULTS_WITH_PARAMS_URI, capturedUri);
-        assertEquals("1589428800000", actualUri.getQueryParams().getFirst("onOrAfterTimestamp"));
-        assertEquals("0", actualUri.getQueryParams().getFirst("offset"));
-        assertEquals("3", actualUri.getQueryParams().getFirst("limit"));
     }
 
     @Test
     public void getResultByIdTest() {
         when(responseSpec.body(RACE_REF)).thenReturn(RESPONSE_WITH_SINGLE_RESULT);
         RaceDto actualRaceDto = raceService.getResultById("fi35d345");
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(RACE_REF);
         assertEquals(EXPECTED_RACE_DTO, actualRaceDto);
-
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_BY_ID_RESULT_URI, capturedUri);
+        verifyRestClientActions(RACE_REF, EXPECTED_GET_BY_ID_RESULT_URI);
     }
 
     @Test
@@ -141,15 +108,8 @@ public class RaceServiceTest {
     public void getLastResultTest() {
         when(responseSpec.body(RACE_REF)).thenReturn(RESPONSE_WITH_SINGLE_RESULT);
         RaceDto actualRaceDto = raceService.getLastResult();
-
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(RACE_REF);
         assertEquals(EXPECTED_RACE_DTO, actualRaceDto);
-
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(EXPECTED_GET_LAST_RESULT_URI, capturedUri);
+        verifyRestClientActions(RACE_REF, EXPECTED_GET_LAST_RESULT_URI);
     }
 
     @Test
@@ -157,4 +117,14 @@ public class RaceServiceTest {
         when(responseSpec.body(RACE_REF)).thenReturn(SINGLE_RESPONSE_WITH_NULL);
         assertThrows(NotFoundException.class, () -> raceService.getLastResult());
     }
+
+    public void verifyRestClientActions(ParameterizedTypeReference reference, URI expectedUri) {
+        verify(restClient).get();
+        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        verify(requestHeadersSpec).retrieve();
+        verify(responseSpec).body(reference);
+        URI capturedUri = uriCaptor.getValue();
+        assertEquals(expectedUri, capturedUri);
+    }
+
 }

@@ -1,6 +1,7 @@
 package holymagic.typeservice.controller;
 
 import holymagic.typeservice.dto.RankedRaceDto;
+import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.service.LeaderboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,34 @@ public class LeaderboardController {
                                                               @RequestParam(required = false) Integer pageSize,
                                                               @RequestParam(required = false) Boolean friendsOnly) {
         return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, page, pageSize, friendsOnly));
+    }
+
+    @Operation(summary = "Get the rank of the current user on the all-time leaderboard")
+    @GetMapping("/rank")
+    public ResponseEntity<RankedRaceDto> getRank(@RequestParam String language,
+                                                 @RequestParam String mode,
+                                                 @RequestParam String mode2,
+                                                 @RequestParam(required = false) Boolean friendsOnly) {
+        return ResponseEntity.ok(leaderboardService.getRank(language, mode, mode2, friendsOnly));
+    }
+
+    @Operation(summary = "Get daily leaderboard")
+    @GetMapping("/daily")
+    public ResponseEntity<List<RankedRaceDto>> getDailyLeaderboard(@RequestParam String language,
+                                                                   @RequestParam String mode,
+                                                                   @RequestParam String mode2,
+                                                                   @RequestParam(required = false) Integer page,
+                                                                   @RequestParam(required = false) Integer pageSize,
+                                                                   @RequestParam(required = false) Boolean friendsOnly) {
+        return ResponseEntity.ok(leaderboardService.getDailyLeaderboard(language, mode, mode2,
+                page, pageSize, friendsOnly));
+    }
+
+    @Operation(summary = "Get weekly xp leaderboard")
+    @GetMapping("/xp/weekly")
+    public ResponseEntity<List<WeeklyActivityDto>> getWeeklyXpLeaderboard(@RequestParam(required = false) Integer page,
+                                                                          @RequestParam(required = false) Integer pageSize,
+                                                                          @RequestParam(required = false) Boolean friendsOnly) {
+        return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
     }
 }

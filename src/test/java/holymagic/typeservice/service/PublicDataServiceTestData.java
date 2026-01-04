@@ -33,4 +33,5 @@ public class PublicDataServiceTestData {
             URI.create("/public/speedHistogram?language=english&mode=time&mode2=60");
     public static final URI EXPECTED_GET_TYPING_STATS_URI =
             URI.create("/public/typingStats");
+
 }
