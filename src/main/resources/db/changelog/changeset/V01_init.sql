@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS races
+(
+    id VARCHAR(255) PRIMARY KEY,
+    uid VARCHAR(255) NOT NULL,
+    wpm DOUBLE PRECISION,
+    char_stats INTEGER[4] NOT NULL DEFAULT '{}',
+    acc DOUBLE PRECISION,
+    mode VARCHAR(255),
+    mode2 VARCHAR(255),
+    timestamp BIGINT,
+    test_duration DOUBLE PRECISION
+)

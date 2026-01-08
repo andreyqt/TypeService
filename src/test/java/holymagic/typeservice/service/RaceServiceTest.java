@@ -3,6 +3,7 @@ package holymagic.typeservice.service;
 import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.mapper.RaceMapperImpl;
+import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.validator.RaceValidator;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,9 @@ import static holymagic.typeservice.service.RaceServiceTestData.SINGLE_RESPONSE_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +50,8 @@ public class RaceServiceTest {
     private RaceValidator raceValidator;
     @Mock
     private RestClient restClient;
+    @Mock
+    private RaceCache raceCache;
     @Spy
     private RaceMapper raceMapper = new RaceMapperImpl();
     @Mock
@@ -91,10 +97,22 @@ public class RaceServiceTest {
     }
 
     @Test
+    public void getResultByIdFromCache() {
+        reset(restClient, requestHeadersSpec, requestHeadersUriSpec);
+        Race expectedRace = RaceServiceTestData.provideRaces().getFirst();
+        RaceDto expectedRaceDto = raceMapper.toDto(expectedRace);
+        when(raceCache.getById("fi35d345")).thenReturn(expectedRace);
+        RaceDto actualRaceDto = raceService.getResultById("fi35d345");
+        assertEquals(expectedRaceDto, actualRaceDto);
+        verifyNoRestClientActions();
+    }
+
+    @Test
     public void getResultByIdTest() {
         when(responseSpec.body(RACE_REF)).thenReturn(RESPONSE_WITH_SINGLE_RESULT);
         RaceDto actualRaceDto = raceService.getResultById("fi35d345");
         assertEquals(EXPECTED_RACE_DTO, actualRaceDto);
+        verify(raceCache, times(1)).add(any(Race.class));
         verifyRestClientActions(RACE_REF, EXPECTED_GET_BY_ID_RESULT_URI);
     }
 
@@ -125,6 +143,12 @@ public class RaceServiceTest {
         verify(responseSpec).body(reference);
         URI capturedUri = uriCaptor.getValue();
         assertEquals(expectedUri, capturedUri);
+    }
+
+    public void verifyNoRestClientActions() {
+        verify(restClient, times(0)).get();
+        verify(requestHeadersUriSpec, times(0)).uri(any(URI.class));
+        verify(requestHeadersSpec, times(0)).retrieve();
     }
 
 }
