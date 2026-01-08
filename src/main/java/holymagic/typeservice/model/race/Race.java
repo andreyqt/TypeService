@@ -2,9 +2,7 @@ package holymagic.typeservice.model.race;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import holymagic.typeservice.model.PostgresSQLIntArrayType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
