@@ -7,6 +7,7 @@ import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
 import holymagic.typeservice.validator.RaceValidator;
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RACES_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.RACE_REF;
@@ -88,6 +90,7 @@ public class RaceService {
         return raceMapper.toDto(race);
     }
 
+    @Transactional
     public RaceDto saveRace(String raceId) {
         Race raceFromCache = raceCache.getById(raceId);
         if (raceFromCache != null) {
@@ -97,6 +100,7 @@ public class RaceService {
         throw new NotFoundException("race is not in cache");
     }
 
+    @Transactional
     public RaceDto saveRace(Long timestamp) {
         Race raceFromCache = raceCache.get(timestamp);
         if (raceFromCache != null) {
@@ -104,6 +108,26 @@ public class RaceService {
             return raceMapper.toDto(raceFromCache);
         }
         throw new NotFoundException("race is not in cache");
+    }
+
+    @Transactional
+    public void deleteRace(String raceId) {
+        Optional<Race> race = raceRepository.findById(raceId);
+        if (race.isPresent()) {
+            raceRepository.delete(race.get());
+            log.info("race {} was deleted", raceId);
+        }
+        else throw new NotFoundException("couldn't delete by id: race is not in db");
+    }
+
+    @Transactional
+    public void deleteRace(Long timestamp) {
+        Race race = raceRepository.findByTimestamp(timestamp);
+        if (race != null) {
+            raceRepository.delete(race);
+            log.info("race with timestamp {} was deleted", timestamp);
+        }
+        else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
     }
 
     @Async("cacheUpdateExecutor")
