@@ -116,8 +116,7 @@ public class RaceService {
         if (race.isPresent()) {
             raceRepository.delete(race.get());
             log.info("race {} was deleted", raceId);
-        }
-        else throw new NotFoundException("couldn't delete by id: race is not in db");
+        } else throw new NotFoundException("couldn't delete by id: race is not in db");
     }
 
     @Transactional
@@ -126,8 +125,13 @@ public class RaceService {
         if (race != null) {
             raceRepository.delete(race);
             log.info("race with timestamp {} was deleted", timestamp);
-        }
-        else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
+        } else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
+    }
+
+    @Transactional
+    public void saveAllRacesFromCache(List<Race> racesFromCache) {
+        List<Race> races = raceCache.getAll();
+        raceRepository.saveAll(racesFromCache);
     }
 
     @Async("cacheUpdateExecutor")

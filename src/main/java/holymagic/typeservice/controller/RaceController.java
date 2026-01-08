@@ -5,6 +5,7 @@ import holymagic.typeservice.service.RaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +51,20 @@ public class RaceController {
     @PostMapping("/save/timestamp/{timestamp}")
     public ResponseEntity<RaceDto> saveRace(@PathVariable Long timestamp) {
         return ResponseEntity.ok(raceService.saveRace(timestamp));
+    }
+
+    @Operation(summary = "Deletes race by id from db")
+    @DeleteMapping("/delete/id/{id}")
+    public ResponseEntity<String> deleteRace(@PathVariable String id) {
+        raceService.deleteRace(id);
+        return ResponseEntity.ok("race with id " + id + " was deleted");
+    }
+
+    @Operation(summary = "Deletes race by timestamp from db")
+    @DeleteMapping("/delete/timestamp/{timestamp}")
+    public ResponseEntity<String> deleteRace(@PathVariable Long timestamp) {
+        raceService.deleteRace(timestamp);
+        return ResponseEntity.ok("race with timestamp " + timestamp + " was deleted");
     }
 
 }
