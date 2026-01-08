@@ -59,4 +59,5 @@ public class RaceValidatorTest {
         Assertions.assertEquals("limit must be between 0 and " + 1000,
                 exceptionWithOutOfRangeLimit.getMessage());
     }
+
 }
