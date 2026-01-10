@@ -7,22 +7,30 @@ import holymagic.typeservice.mapper.WeeklyActivityMapper;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
+import holymagic.typeservice.repository.RankedRaceRepository;
 import holymagic.typeservice.validator.LeaderboardValidator;
 import holymagic.typeservice.validator.PublicDataValidator;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LEADERBOARD_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.RANKED_RACE_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.XP_LEADERBOARD_REF;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LeaderboardService {
@@ -32,10 +40,20 @@ public class LeaderboardService {
     private final PublicDataValidator publicDataValidator;
     private final LeaderboardValidator leaderboardValidator;
     private final WeeklyActivityMapper weeklyActivityMapper;
+    private final LeaderboardCache leaderboardCache;
+    private final RankedRaceRepository rankedRaceRepository;
 
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
                                               @Nullable Boolean friendsOnly) {
+
+        List<RankedRace> racesFromCache = getRacesFromCache(language, mode, mode2, page, pageSize, friendsOnly);
+
+        if(racesFromCache != null) {
+            log.info("retrieved leaderboard from cache");
+            return rankedRaceMapper.toDto(racesFromCache);
+        }
+
         URI uri = prepareGetLeaderboardUri("/leaderboards", language, mode, mode2, page, pageSize, friendsOnly);
 
         Leaderboard leaderboard = restClient.get()
@@ -105,6 +123,56 @@ public class LeaderboardService {
 
         validateData(activity, "could not get the weekly xp leaderboard");
         return weeklyActivityMapper.toDto(activity);
+    }
+
+    @Transactional
+    public void saveLeaderboardFromCache() {
+        rankedRaceRepository.saveAll(leaderboardCache.getAll());
+        log.info("leaderboards has been saved");
+    }
+
+    @PostConstruct
+    public void initializeLeaderboardCache() {
+        List<RankedRace> initialRaces = new ArrayList<>(250);
+        URI firstUri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
+                "60", 0, 200, null);
+        URI secondUri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
+                "60", 4, 50, null);
+        try {
+            Leaderboard firstLeaderboard = restClient.get()
+                    .uri(firstUri)
+                    .retrieve()
+                    .body(LEADERBOARD_REF)
+                    .getData();
+            initialRaces.addAll(firstLeaderboard.getEntries());
+            Leaderboard secondLeaderboard = restClient.get()
+                    .uri(secondUri)
+                    .retrieve()
+                    .body(LEADERBOARD_REF)
+                    .getData();
+            initialRaces.addAll(secondLeaderboard.getEntries());
+            leaderboardCache.add(initialRaces);
+            log.info("caches has been initialized successfully");
+        } catch (Exception e) {
+            log.error("could not initialize the leaderboard cache: {}", e.getMessage());
+        }
+
+    }
+
+    public List<RankedRace> getRacesFromCache(String language, String mode, String mode2,
+                                               @Nullable Integer page, @Nullable Integer pageSize,
+                                               @Nullable Boolean friendsOnly) {
+        if (language.equals("english") && mode.equals("time") && mode2.equals("60") && friendsOnly == null
+        && page == null && pageSize == null) {
+            return leaderboardCache.getAll();
+        }
+        return null;
+    }
+
+    @Async("cacheUpdateExecutor")
+    @Scheduled(cron = "${leaderboard_update_cron}")
+    public void updateLeaderboardCache() {
+        initializeLeaderboardCache();
     }
 
     private URI prepareGetLeaderboardUri(String path, String language, String mode, String mode2,

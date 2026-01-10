@@ -1,7 +1,6 @@
 package holymagic.typeservice.model.race;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import holymagic.typeservice.model.PostgresSQLIntArrayType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,7 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class Race {
     private String uid;
 
     @Column(name = "char_stats", columnDefinition = "int[]")
-    @Type(value = PostgresSQLIntArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
     private int[] charStats = new int[4];
 
     @Column(name = "wpm")

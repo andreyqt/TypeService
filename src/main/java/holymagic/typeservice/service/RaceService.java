@@ -7,7 +7,7 @@ import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
 import holymagic.typeservice.validator.RaceValidator;
 import jakarta.annotation.Nullable;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
@@ -90,6 +91,32 @@ public class RaceService {
         return raceMapper.toDto(race);
     }
 
+    public RaceDto getRaceFromCacheByTimestamp(Long timestamp) {
+        Race race = raceCache.get(timestamp);
+        if (race != null) {
+            return raceMapper.toDto(race);
+        }
+        else throw new NotFoundException(String.format("race with timestamp %s was not found in cache", timestamp));
+    }
+
+    @Transactional(readOnly = true)
+    public RaceDto getRaceByIdFromDb(String raceId) {
+        Optional<Race> race = raceRepository.findById(raceId);
+        if (race.isPresent()) {
+            return raceMapper.toDto(race.get());
+        }
+        throw new EntityNotFoundException(String.format("race with id %s was not found", raceId));
+    }
+
+    @Transactional(readOnly = true)
+    public RaceDto getRaceByTimestampFromDb(Long timestamp) {
+        Race race = raceRepository.findByTimestamp(timestamp);
+        if (race != null) {
+            return raceMapper.toDto(race);
+        }
+        throw new EntityNotFoundException(String.format("race with timestamp %s was not found", timestamp));
+    }
+
     @Transactional
     public RaceDto saveRace(String raceId) {
         Race raceFromCache = raceCache.getById(raceId);
@@ -116,8 +143,7 @@ public class RaceService {
         if (race.isPresent()) {
             raceRepository.delete(race.get());
             log.info("race {} was deleted", raceId);
-        }
-        else throw new NotFoundException("couldn't delete by id: race is not in db");
+        } else throw new NotFoundException("couldn't delete by id: race is not in db");
     }
 
     @Transactional
@@ -126,8 +152,14 @@ public class RaceService {
         if (race != null) {
             raceRepository.delete(race);
             log.info("race with timestamp {} was deleted", timestamp);
-        }
-        else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
+        } else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
+    }
+
+    @Transactional
+    public void saveAllRacesFromCache() {
+        List<Race> races = raceCache.getAll();
+        raceRepository.saveAll(races);
+        log.info("{} races were saved to db", races.size());
     }
 
     @Async("cacheUpdateExecutor")
