@@ -42,6 +42,7 @@ import static holymagic.typeservice.service.LeaderboardServiceTestData.XP_LEADER
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +50,8 @@ import static org.mockito.Mockito.when;
 public class LeaderboardServiceTest {
     @Mock
     private RestClient restClient;
+    @Mock
+    private LeaderboardCache leaderboardCache;
     @Spy
     private RankedRaceMapperImpl rankedRaceMapper;
     @Spy
@@ -80,6 +83,7 @@ public class LeaderboardServiceTest {
 
     @Test
     public void getLeaderboardTest() {
+        when(leaderboardCache.getAll()).thenReturn(null);
         when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_RESPONSE);
         List<RankedRaceDto> actualDtoList = leaderboardService.getLeaderboard("english", "time",
                 "60", null, null, null);
@@ -90,6 +94,7 @@ public class LeaderboardServiceTest {
 
     @Test
     public void getLeaderboardWithNullDataTest() {
+        when(leaderboardCache.getAll()).thenReturn(null);
         when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_NULL_RESPONSE);
         NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             leaderboardService.getLeaderboard("english",

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ import java.util.List;
 public class LeaderboardController {
     private final LeaderboardService leaderboardService;
 
-    @Operation(summary = "Get all-time leaderboard")
+    @Operation(summary = "Gets all-time leaderboard")
     @GetMapping("/")
     public ResponseEntity<List<RankedRaceDto>> getLeaderboard(@RequestParam String language,
                                                               @RequestParam String mode,
@@ -30,7 +31,7 @@ public class LeaderboardController {
         return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, page, pageSize, friendsOnly));
     }
 
-    @Operation(summary = "Get the rank of the current user on the all-time leaderboard")
+    @Operation(summary = "Gets the rank of the current user on the all-time leaderboard")
     @GetMapping("/rank")
     public ResponseEntity<RankedRaceDto> getRank(@RequestParam String language,
                                                  @RequestParam String mode,
@@ -39,7 +40,7 @@ public class LeaderboardController {
         return ResponseEntity.ok(leaderboardService.getRank(language, mode, mode2, friendsOnly));
     }
 
-    @Operation(summary = "Get daily leaderboard")
+    @Operation(summary = "Gets daily leaderboard")
     @GetMapping("/daily")
     public ResponseEntity<List<RankedRaceDto>> getDailyLeaderboard(@RequestParam String language,
                                                                    @RequestParam String mode,
@@ -51,11 +52,19 @@ public class LeaderboardController {
                 page, pageSize, friendsOnly));
     }
 
-    @Operation(summary = "Get weekly xp leaderboard")
+    @Operation(summary = "Gets weekly xp leaderboard")
     @GetMapping("/xp/weekly")
     public ResponseEntity<List<WeeklyActivityDto>> getWeeklyXpLeaderboard(@RequestParam(required = false) Integer page,
                                                                           @RequestParam(required = false) Integer pageSize,
                                                                           @RequestParam(required = false) Boolean friendsOnly) {
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
     }
+
+    @Operation(summary = "Saves top 250 players in english language for 60s in db")
+    @PostMapping("/db/save/all")
+    public ResponseEntity<String> saveLeaderboardFromCache() {
+        leaderboardService.saveLeaderboardFromCache();
+        return ResponseEntity.ok("Leaderboard has been saved");
+    }
+
 }

@@ -1,12 +1,9 @@
 package holymagic.typeservice.repository;
 
-import holymagic.typeservice.model.race.Race;
+import holymagic.typeservice.model.leaderboard.RankedRace;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RaceRepository extends JpaRepository<Race, String> {
-
-    Race findByTimestamp(Long timestamp);
-
+public interface RankedRaceRepository extends JpaRepository<RankedRace, Double> {
 }

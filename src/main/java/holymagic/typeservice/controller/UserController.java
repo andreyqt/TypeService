@@ -30,7 +30,7 @@ public class UserController {
         return ResponseEntity.ok(userService.checkName(name));
     }
 
-    @Operation(summary = "Get user's personal bests")
+    @Operation(summary = "Gets user's personal bests")
     @GetMapping("/personalBests/{mode}")
     public ResponseEntity<Map<String, List<PersonalBestDto>>> getPersonalBests(@PathVariable String mode) {
         return ResponseEntity.ok(userService.getPersonalBests(mode));
@@ -55,13 +55,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile(name));
     }
 
-    @Operation(summary = "Get test activity for the last up to 372 days for the current user")
+    @Operation(summary = "Gets test activity for the last up to 372 days for the current user")
     @GetMapping("/activity")
     public ResponseEntity<CurrentTestActivityDto> getCurrentTestActivity() {
         return ResponseEntity.ok(userService.getCurrentTestActivity());
     }
 
-    @Operation(summary = "Get user's streak data")
+    @Operation(summary = "Gets user's streak data")
     @GetMapping("/streak")
     public ResponseEntity<StreakDto> getStreak() {
         return ResponseEntity.ok(userService.getStreak());

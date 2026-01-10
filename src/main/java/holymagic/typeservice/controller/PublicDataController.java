@@ -18,7 +18,7 @@ import java.util.Map;
 public class PublicDataController {
     private final PublicDataService publicDataService;
 
-    @Operation(summary = "get number of users personal bests grouped by wpm level (multiples of ten)")
+    @Operation(summary = "gets number of users personal bests grouped by wpm level (multiples of ten)")
     @GetMapping("/speedHistogram")
     public ResponseEntity<Map<String, Integer>> getSpeedHistogram(@RequestParam String language,
                                                                 @RequestParam String mode,
@@ -26,7 +26,7 @@ public class PublicDataController {
         return ResponseEntity.ok(publicDataService.getSpeedHistogram(language, mode, mode2));
     }
 
-    @Operation(summary = "get number of tests and time users spend typing")
+    @Operation(summary = "gets number of tests and time users spend typing")
     @GetMapping("/typingStats")
     public ResponseEntity<TypingStats> getTypingStats() {
         return ResponseEntity.ok(publicDataService.getTypingStats());
