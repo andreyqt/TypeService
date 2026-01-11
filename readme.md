@@ -1,4 +1,4 @@
-# TypeService - приложение для получения данных [monkeytype](https://monkeytype.com/).
+# TypeService - приложение для получения данных с [monkeytype](https://monkeytype.com/).
 
 # В целом, реализованы почти все методы [monkeytype API](https://api.monkeytype.com/docs) из разделов:
 
@@ -33,7 +33,7 @@ Restful-приложение с endpoint'ами:
 [Service](/src/main/java/holymagic/typeservice/service), [Repository](/src/main/java/holymagic/typeservice/repository);
 * написан [GlobalExceptionHandler](/src/main/java/holymagic/typeservice/exception/GlobalExceptionHandler.java), есть конфигурация
 [OpenApi](/src/main/java/holymagic/typeservice/config/OpenApiConfig.java);
-* Слой Repository реализован на JPA (Hibernate).
+* слой Repository реализован на JPA (Hibernate).
 
 # База данных
 
