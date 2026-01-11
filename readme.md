@@ -1,6 +1,8 @@
-# TypeService - приложение для получения данных с [monkeytype](https://monkeytype.com/).
+# Type Service
 
-# В целом, реализованы почти все методы [monkeytype API](https://api.monkeytype.com/docs) из разделов:
+TypeService - приложение для получения данных с [monkeytype](https://monkeytype.com/).
+
+В целом, реализованы почти все методы [monkeytype API](https://api.monkeytype.com/docs) из разделов:
 
 * [user](/src/main/java/holymagic/typeservice/controller/UserController.java);
 * [test results](/src/main/java/holymagic/typeservice/controller/RaceController.java);
