@@ -27,7 +27,9 @@ public class OpenApiConfig {
                         API gives access to:
                         1) user account data;
                         2) user test results;
-                        3) Public data.
+                        3) public data;
+                        4) leaderboards data;
+                        5) database management.
                         """
                         )
                         .contact(new Contact()
