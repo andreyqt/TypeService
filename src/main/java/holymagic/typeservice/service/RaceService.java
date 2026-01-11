@@ -12,6 +12,7 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class RaceService {
     private final RestClient restClient;
     private final RaceCache raceCache;
     private final RaceRepository raceRepository;
+
+    @Value("${race_cache_init_filling}")
+    private int initCacheFilling;
 
     public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
                                     @Nullable Integer offset,
@@ -166,7 +170,7 @@ public class RaceService {
     @Scheduled(fixedRateString = "${cache_update_interval}m")
     public void updateCache() {
         URI uri = UriBuilder.fromPath("/results")
-                .queryParam("limit", "80")
+                .queryParam("limit", initCacheFilling)
                 .build();
         List<Race> races = restClient.get()
                 .uri(uri)
