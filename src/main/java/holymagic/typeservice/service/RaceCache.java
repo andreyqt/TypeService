@@ -81,6 +81,10 @@ public class RaceCache {
         }
     }
 
+    public void clear() {
+        CACHE.clear();
+    }
+
     public List<Race> getAll() {
         return new ArrayList<>(CACHE.values());
     }

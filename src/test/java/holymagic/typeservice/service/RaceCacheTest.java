@@ -108,4 +108,11 @@ public class RaceCacheTest {
         assertEquals(3, raceCache.getSize());
     }
 
+    @Test
+    public void clearTest() {
+        assertEquals(3, raceCache.getSize());
+        raceCache.clear();
+        assertEquals(0, raceCache.getSize());
+    }
+
 }
