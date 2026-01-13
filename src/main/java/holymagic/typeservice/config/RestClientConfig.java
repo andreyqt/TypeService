@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,7 @@ public class RestClientConfig {
             String statusText = response.getStatusText();
             log.error("Request failed! \n method: {} \n uri: {} \n code: {}, {} \n timestamp: {}",
                     request.getMethod(), request.getURI(), statusCode, statusText, LocalDateTime.now());
+            throw new HttpClientErrorException(statusCode, statusText);
         };
     }
 
@@ -50,6 +53,7 @@ public class RestClientConfig {
             log.error("Server failed to complete request! \n code: {}, text: {} \n timestamp: {}",
                     statusCode, statusText, LocalDateTime.now()
             );
+            throw new HttpServerErrorException(statusCode, statusText);
         };
     }
 
