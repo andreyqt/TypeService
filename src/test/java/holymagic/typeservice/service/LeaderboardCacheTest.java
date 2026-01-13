@@ -1,6 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,11 @@ public class LeaderboardCacheTest {
         ReflectionTestUtils.setField(leaderboardCache, "capacity", testCapacity);
     }
 
+    @AfterEach
+    void tearDown() {
+        leaderboardCache.clear();
+    }
+
     @Test
     public void addTest() {
         List<RankedRace> races = provideRankedRaces(250);
@@ -41,16 +47,14 @@ public class LeaderboardCacheTest {
     public void addMoreThanAllowedTest() {
         List<RankedRace> races = provideRankedRaces(300);
         String expectedMsg = String.format("can't add more than %d races", testCapacity);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            leaderboardCache.add(races);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> leaderboardCache.add(races));
         assertEquals(expectedMsg, exception.getMessage());
     }
 
     @Test
     public void addLowRanksTest() {
         List<RankedRace> races = provideRankedRaces(100);
-        List<RankedRace> racesWithLowRanks = provideLowRanksRaces(100);
+        List<RankedRace> racesWithLowRanks = provideLowRankRaces(100);
         leaderboardCache.add(races);
         leaderboardCache.add(racesWithLowRanks);
         int actualSize = leaderboardCache.getSize();
@@ -80,7 +84,7 @@ public class LeaderboardCacheTest {
         return rankedRaces;
     }
 
-    public static List<RankedRace> provideLowRanksRaces(int quantity) {
+    public static List<RankedRace> provideLowRankRaces(int quantity) {
         List<RankedRace> rankedRaces = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {
             int rank = 251 + i;

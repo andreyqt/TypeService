@@ -38,15 +38,11 @@ public class RaceService {
     private final RaceRepository raceRepository;
 
     @Value("${race_cache_init_filling}")
-    private int initCacheFilling;
+    private int cacheFillingSize;
 
     public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
                                     @Nullable Integer offset,
                                     @Nullable Integer limit) {
-        if (onOrAfterTimestamp == null || offset == null || limit == null) {
-            List<Race> racesFromCache = raceCache.getAll();
-            return raceMapper.toDto(racesFromCache);
-        }
         URI uri = prepareGetResultsUri(onOrAfterTimestamp, offset, limit);
         Response<List<Race>> results = restClient.get()
                 .uri(uri)
@@ -95,7 +91,7 @@ public class RaceService {
         return raceMapper.toDto(race);
     }
 
-    public RaceDto getRaceFromCacheByTimestamp(Long timestamp) {
+    public RaceDto getRaceByTimestampFromCache(Long timestamp) {
         Race race = raceCache.get(timestamp);
         if (race != null) {
             return raceMapper.toDto(race);
@@ -128,7 +124,7 @@ public class RaceService {
             raceRepository.save(raceFromCache);
             return raceMapper.toDto(raceFromCache);
         }
-        throw new NotFoundException("race is not in cache");
+        throw new EntityNotFoundException("race is not in cache");
     }
 
     @Transactional
@@ -138,7 +134,7 @@ public class RaceService {
             raceRepository.save(raceFromCache);
             return raceMapper.toDto(raceFromCache);
         }
-        throw new NotFoundException("race is not in cache");
+        throw new EntityNotFoundException("race is not in cache");
     }
 
     @Transactional
@@ -147,7 +143,7 @@ public class RaceService {
         if (race.isPresent()) {
             raceRepository.delete(race.get());
             log.info("race {} was deleted", raceId);
-        } else throw new NotFoundException("couldn't delete by id: race is not in db");
+        } else throw new EntityNotFoundException("couldn't delete by id: race is not in db");
     }
 
     @Transactional
@@ -156,7 +152,7 @@ public class RaceService {
         if (race != null) {
             raceRepository.delete(race);
             log.info("race with timestamp {} was deleted", timestamp);
-        } else throw new NotFoundException("couldn't delete by timestamp: race is not in db");
+        } else throw new EntityNotFoundException("couldn't delete by timestamp: race is not in db");
     }
 
     @Transactional
@@ -170,7 +166,7 @@ public class RaceService {
     @Scheduled(fixedRateString = "${cache_update_interval}m")
     public void updateCache() {
         URI uri = UriBuilder.fromPath("/results")
-                .queryParam("limit", initCacheFilling)
+                .queryParam("limit", cacheFillingSize)
                 .build();
         List<Race> races = restClient.get()
                 .uri(uri)
@@ -187,7 +183,7 @@ public class RaceService {
     @Async("cacheUpdateExecutor")
     @Scheduled(fixedRateString = "${cache_removal_interval}m")
     public void removeOldRaces() {
-        raceCache.checkBound();
+        raceCache.removeOldRaces();
     }
 
     private URI prepareGetResultsUri(@Nullable Long onOrAfterTimestamp,

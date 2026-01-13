@@ -38,7 +38,7 @@ public class RaceController {
     @Operation(summary = "Gets result by timestamp from cache")
     @GetMapping("/timestamp/{timestamp}")
     public ResponseEntity<RaceDto> getRaceByTimestamp(@PathVariable Long timestamp) {
-        return ResponseEntity.ok(raceService.getRaceFromCacheByTimestamp(timestamp));
+        return ResponseEntity.ok(raceService.getRaceByTimestampFromCache(timestamp));
     }
 
     @Operation(summary = "Gets a user's last saved result")
@@ -65,13 +65,13 @@ public class RaceController {
         return ResponseEntity.ok(raceService.saveRace(id));
     }
 
-    @Operation(summary = "Saves race by timestamp from cache into db")
+    @Operation(summary = "Gets race from cache and saves into db")
     @PostMapping("/save/timestamp/{timestamp}")
     public ResponseEntity<RaceDto> saveRace(@PathVariable Long timestamp) {
         return ResponseEntity.ok(raceService.saveRace(timestamp));
     }
 
-    @Operation(summary = "Saves all races in cache to db")
+    @Operation(summary = "Saves all races from cache to db")
     @PostMapping("/save/all")
     public ResponseEntity<String> saveAllRaces() {
         raceService.saveAllRacesFromCache();
