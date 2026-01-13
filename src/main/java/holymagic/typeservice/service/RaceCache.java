@@ -38,10 +38,10 @@ public class RaceCache {
         if (quantity <= 0) {
             throw new IllegalArgumentException("quantity must be greater than 0");
         }
-        if (quantity > capacity) {
-            return getAll();
-        }
-        return CACHE.values().stream().limit(quantity).toList();
+        return CACHE.values()
+                .stream().
+                limit(Math.min(quantity, CACHE.size()))
+                .toList();
 
     }
 
@@ -50,8 +50,11 @@ public class RaceCache {
     }
 
     public void add(List<Race> races) {
+        if (races == null || races.isEmpty()) {
+            return;
+        }
         if (races.size() > capacity) {
-            log.warn("An was made attempt to add more races than allowed!");
+            log.warn("An attempt was made to add more races than allowed!");
         } else {
             for (Race race : races) {
                 add(race);
@@ -97,7 +100,7 @@ public class RaceCache {
         return CACHE.lastEntry().getValue();
     }
 
-    public void checkBound() {
+    public void removeOldRaces() {
         while (CACHE.size() > upperBound) {
             CACHE.remove(CACHE.lastKey());
         }
@@ -107,6 +110,7 @@ public class RaceCache {
         while (CACHE.size() > capacity) {
             CACHE.remove(CACHE.lastKey());
         }
+        log.info("Excess from race cache was removes");
     }
 
 }

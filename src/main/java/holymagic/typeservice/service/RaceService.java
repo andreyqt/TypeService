@@ -187,7 +187,7 @@ public class RaceService {
     @Async("cacheUpdateExecutor")
     @Scheduled(fixedRateString = "${cache_removal_interval}m")
     public void removeOldRaces() {
-        raceCache.checkBound();
+        raceCache.removeOldRaces();
     }
 
     private URI prepareGetResultsUri(@Nullable Long onOrAfterTimestamp,
