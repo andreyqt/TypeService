@@ -47,9 +47,7 @@ public class LeaderboardCacheTest {
     public void addMoreThanAllowedTest() {
         List<RankedRace> races = provideRankedRaces(300);
         String expectedMsg = String.format("can't add more than %d races", testCapacity);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            leaderboardCache.add(races);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> leaderboardCache.add(races));
         assertEquals(expectedMsg, exception.getMessage());
     }
 
