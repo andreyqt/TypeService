@@ -106,6 +106,10 @@ public class RaceCache {
         }
     }
 
+    public void clear() {
+        CACHE.clear();
+    }
+
     private void removeExcess() {
         while (CACHE.size() > capacity) {
             CACHE.remove(CACHE.lastKey());

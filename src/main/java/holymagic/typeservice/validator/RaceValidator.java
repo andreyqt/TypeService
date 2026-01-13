@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RaceValidator {
+
     @Value("${onOrAfterTimestamp}")
     private Long initialTimestamp;
 
@@ -12,6 +13,9 @@ public class RaceValidator {
     private int maxLimit;
 
     public void validateTimestamp(Long timestamp) {
+        if (timestamp == null) {
+            return;
+        }
         if (timestamp < initialTimestamp) {
             throw new IllegalArgumentException("timestamp must be >= " + initialTimestamp);
         }
@@ -28,4 +32,5 @@ public class RaceValidator {
             throw new IllegalArgumentException("limit must be between 0 and " + maxLimit);
         }
     }
+
 }

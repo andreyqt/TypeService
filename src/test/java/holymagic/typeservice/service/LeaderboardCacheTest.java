@@ -1,6 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,11 @@ public class LeaderboardCacheTest {
         testCapacity = 250;
         leaderboardCache = new LeaderboardCache();
         ReflectionTestUtils.setField(leaderboardCache, "capacity", testCapacity);
+    }
+
+    @AfterEach
+    void tearDown() {
+        leaderboardCache.clear();
     }
 
     @Test
@@ -50,7 +56,7 @@ public class LeaderboardCacheTest {
     @Test
     public void addLowRanksTest() {
         List<RankedRace> races = provideRankedRaces(100);
-        List<RankedRace> racesWithLowRanks = provideLowRanksRaces(100);
+        List<RankedRace> racesWithLowRanks = provideLowRankRaces(100);
         leaderboardCache.add(races);
         leaderboardCache.add(racesWithLowRanks);
         int actualSize = leaderboardCache.getSize();
@@ -80,7 +86,7 @@ public class LeaderboardCacheTest {
         return rankedRaces;
     }
 
-    public static List<RankedRace> provideLowRanksRaces(int quantity) {
+    public static List<RankedRace> provideLowRankRaces(int quantity) {
         List<RankedRace> rankedRaces = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {
             int rank = 251 + i;

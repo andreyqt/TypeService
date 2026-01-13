@@ -1,6 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.race.Race;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,11 @@ public class RaceCacheTest {
         ReflectionTestUtils.setField(raceCache, "upperBound", 3);
         races = RaceServiceTestData.provideRaces();
         raceCache.add(races);
+    }
+
+    @AfterEach
+    void tearDown() {
+        raceCache.clear();
     }
 
     @Test

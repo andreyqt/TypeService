@@ -5,6 +5,7 @@ import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.mapper.RaceMapperImpl;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.validator.RaceValidator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
