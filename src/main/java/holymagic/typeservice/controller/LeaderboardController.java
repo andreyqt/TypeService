@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,13 +57,6 @@ public class LeaderboardController {
                                                                           @RequestParam(required = false) Integer pageSize,
                                                                           @RequestParam(required = false) Boolean friendsOnly) {
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
-    }
-
-    @Operation(summary = "Saves top 250 players in english language for 60s in db")
-    @PostMapping("/db/save/all")
-    public ResponseEntity<String> saveLeaderboardFromCache() {
-        leaderboardService.saveLeaderboardFromCache();
-        return ResponseEntity.ok("Leaderboard has been saved");
     }
 
 }

@@ -26,13 +26,13 @@ public class RaceController {
     public ResponseEntity<List<RaceDto>> getResults(@RequestParam(required = false) Long onOrAfterTimestamp,
                                                     @RequestParam(required = false) Integer offset,
                                                     @RequestParam(required = false) Integer limit) {
-        return ResponseEntity.ok(raceService.getResults(onOrAfterTimestamp, offset, limit));
+        return ResponseEntity.ok(raceService.getResultsFromRequest(onOrAfterTimestamp, offset, limit));
     }
 
     @Operation(summary = "Gets result by id")
     @GetMapping("/{id}")
     public ResponseEntity<RaceDto> getRaceById(@PathVariable String id) {
-        return ResponseEntity.ok(raceService.getResultById(id));
+        return ResponseEntity.ok(raceService.getResultByIdFromRequest(id));
     }
 
     @Operation(summary = "Gets result by timestamp from cache")
@@ -44,7 +44,7 @@ public class RaceController {
     @Operation(summary = "Gets a user's last saved result")
     @GetMapping("/last")
     public ResponseEntity<RaceDto> getLastResult() {
-        return ResponseEntity.ok(raceService.getLastResult());
+        return ResponseEntity.ok(raceService.getLastResultFromRequest());
     }
 
     @Operation(summary = "Gets race from db by id")

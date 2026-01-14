@@ -2,10 +2,9 @@ package holymagic.typeservice.service;
 
 import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
-import holymagic.typeservice.model.Response;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
-import holymagic.typeservice.validator.RaceValidator;
+import holymagic.typeservice.validator.HttpParamValidator;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotFoundException;
@@ -32,62 +31,34 @@ import static holymagic.typeservice.model.ParameterizedTypeReferences.RACE_REF;
 public class RaceService {
 
     private final RaceMapper raceMapper;
-    private final RaceValidator raceValidator;
-    private final RestClient restClient;
     private final RaceCache raceCache;
     private final RaceRepository raceRepository;
+    private final ExchangeService exchangeService;
+    private final HttpParamValidator httpParamValidator;
 
-    @Value("${race_cache_init_filling}")
-    private int cacheFillingSize;
+    @Value("${default_limit}")
+    private int defaultLimit;
 
-    public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
-                                    @Nullable Integer offset,
-                                    @Nullable Integer limit) {
-        URI uri = prepareGetResultsUri(onOrAfterTimestamp, offset, limit);
-        Response<List<Race>> results = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(LIST_OF_RACES_REF);
-        List<Race> races = results.getData();
-        if (races == null) {
-            throw new NotFoundException("results not found");
-        } else {
-            log.info("received {} results", races.size());
-            raceCache.add(races);
-            return raceMapper.toDto(results.getData());
-        }
+    public List<RaceDto> getResultsFromRequest(@Nullable Long onOrAfterTimestamp,
+                                               @Nullable Integer offset,
+                                               @Nullable Integer limit) {
+        URI uri = createGetResulstUri(onOrAfterTimestamp, offset, limit);
+        List<Race> races = exchangeService.makeGetRequest(uri, LIST_OF_RACES_REF);
+        return raceMapper.toDto(races);
     }
 
-    public RaceDto getResultById(String id) {
-        Race raceFromCache = raceCache.getById(id);
-        if (raceFromCache != null) {
-            return raceMapper.toDto(raceFromCache);
-        }
+    public RaceDto getResultByIdFromRequest(String id) {
         URI uri = UriBuilder.fromPath("/results/id/{id}")
                 .build(id);
-        Race race = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(RACE_REF)
-                .getData();
-        if (race == null || race.getId() == null) {
-            throw new NotFoundException("race was not found");
-        }
+        Race race = exchangeService.makeGetRequest(uri, RACE_REF);
         raceCache.add(race);
         return raceMapper.toDto(race);
     }
 
-    public RaceDto getLastResult() {
-        URI uri = UriBuilder.fromPath("/results/last")
-                .build();
-        Race race = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(RACE_REF)
-                .getData();
-        if (race == null || race.getId() == null) {
-            throw new NotFoundException("race was not found");
-        }
+    public RaceDto getLastResultFromRequest() {
+        URI uri = UriBuilder.fromPath("/results/last").build();
+        Race race = exchangeService.makeGetRequest(uri, RACE_REF);
+        raceCache.add(race);
         return raceMapper.toDto(race);
     }
 
@@ -96,7 +67,7 @@ public class RaceService {
         if (race != null) {
             return raceMapper.toDto(race);
         }
-        else throw new NotFoundException(String.format("race with timestamp %s was not found in cache", timestamp));
+        throw new EntityNotFoundException(String.format("race with timestamp %s was not found in cache", timestamp));
     }
 
     @Transactional(readOnly = true)
@@ -165,19 +136,12 @@ public class RaceService {
     @Async("cacheUpdateExecutor")
     @Scheduled(fixedRateString = "${cache_update_interval}m")
     public void updateCache() {
+        int size = raceCache.getSize();
         URI uri = UriBuilder.fromPath("/results")
-                .queryParam("limit", cacheFillingSize)
+                .queryParam("limit", size)
                 .build();
-        List<Race> races = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(LIST_OF_RACES_REF)
-                .getData();
-        if (races == null) {
-            log.warn("wasn't able to get races for cache");
-        } else {
-            raceCache.add(races);
-        }
+        List<Race> races = exchangeService.makeGetRequest(uri, LIST_OF_RACES_REF);
+        raceCache.update(races);
     }
 
     @Async("cacheUpdateExecutor")
@@ -186,20 +150,20 @@ public class RaceService {
         raceCache.removeOldRaces();
     }
 
-    private URI prepareGetResultsUri(@Nullable Long onOrAfterTimestamp,
-                                     @Nullable Integer offset,
-                                     @Nullable Integer limit) {
+    private URI createGetResulstUri(Long timestamp, Integer offset, Integer limit) {
         UriBuilder builder = UriBuilder.fromPath("/results");
-        if (onOrAfterTimestamp != null) {
-            raceValidator.validateTimestamp(onOrAfterTimestamp);
-            builder.queryParam("onOrAfterTimestamp", onOrAfterTimestamp);
+        if (timestamp != null) {
+            httpParamValidator.validateTimestamp(timestamp);
+            builder.queryParam("onOrAfterTimestamp", timestamp);
         }
         if (offset != null) {
-            raceValidator.validateOffset(offset);
+            httpParamValidator.validateOffset(offset);
             builder.queryParam("offset", offset);
         }
-        if (limit != null) {
-            raceValidator.validateLimit(limit);
+        if (limit == null) {
+            builder.queryParam("limit", defaultLimit);
+        } else {
+            httpParamValidator.validateLimit(limit);
             builder.queryParam("limit", limit);
         }
         return builder.build();

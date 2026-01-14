@@ -41,7 +41,6 @@ public class LeaderboardService {
     private final LeaderboardValidator leaderboardValidator;
     private final WeeklyActivityMapper weeklyActivityMapper;
     private final LeaderboardCache leaderboardCache;
-    private final RankedRaceRepository rankedRaceRepository;
 
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
@@ -125,19 +124,12 @@ public class LeaderboardService {
         return weeklyActivityMapper.toDto(activity);
     }
 
-    @Transactional
-    public void saveLeaderboardFromCache() {
-        rankedRaceRepository.saveAll(leaderboardCache.getAll());
-        log.info("leaderboards has been saved");
-    }
 
     @PostConstruct
     public void initializeLeaderboardCache() {
-        List<RankedRace> initialRaces = new ArrayList<>(250);
+        List<RankedRace> initialRaces = new ArrayList<>(50);
         URI firstUri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                "60", 0, 200, null);
-        URI secondUri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                "60", 4, 50, null);
+                "60", 0, 50, null);
         try {
             Leaderboard firstLeaderboard = restClient.get()
                     .uri(firstUri)
@@ -145,13 +137,7 @@ public class LeaderboardService {
                     .body(LEADERBOARD_REF)
                     .getData();
             initialRaces.addAll(firstLeaderboard.getEntries());
-            Leaderboard secondLeaderboard = restClient.get()
-                    .uri(secondUri)
-                    .retrieve()
-                    .body(LEADERBOARD_REF)
-                    .getData();
-            initialRaces.addAll(secondLeaderboard.getEntries());
-            leaderboardCache.add(initialRaces);
+            leaderboardCache.update(initialRaces);
             log.info("caches has been initialized successfully");
         } catch (Exception e) {
             log.error("could not initialize the leaderboard cache: {}", e.getMessage());

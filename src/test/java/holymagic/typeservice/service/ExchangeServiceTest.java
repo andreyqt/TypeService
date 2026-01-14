@@ -1,5 +1,6 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.exception.DataValidationException;
 import holymagic.typeservice.model.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestClient;
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +38,7 @@ public class ExchangeServiceTest {
     private URI testUri;
     private ArgumentCaptor<URI> uriCaptor;
     private Response<String> testResponse;
+    private Response<String> testNullResponse;
     private ParameterizedTypeReference<Response<String>> testReference;
 
 
@@ -45,17 +48,27 @@ public class ExchangeServiceTest {
         testUri = URI.create("https://example.com");
         testReference = new ParameterizedTypeReference<Response<String>>() {};
         testResponse = new Response<>("test message", "test data");
+        testNullResponse = new Response<>("test message", null);
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(uriCaptor.capture())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(testReference)).thenReturn(testResponse);
+
     }
 
     @Test
     public void makeGetRequestTest() {
+        when(responseSpec.body(testReference)).thenReturn(testResponse);
         String actualResponse = exchangeService.makeGetRequest(testUri, testReference);
         assertEquals("test data", actualResponse);
         verifyRestClientActions(testUri, testReference);
+    }
+
+    @Test
+    public void makeGetRequestAndReceiveNullData() {
+        when(responseSpec.body(testReference)).thenReturn(testNullResponse);
+        Exception exception = assertThrows(DataValidationException.class,
+                () -> exchangeService.makeGetRequest(testUri, testReference));
+        assertEquals("Response data is null", exception.getMessage());
     }
 
     public void verifyRestClientActions(URI expectedUri, ParameterizedTypeReference reference) {
