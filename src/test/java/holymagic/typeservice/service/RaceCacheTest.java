@@ -8,13 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import static holymagic.typeservice.service.RaceTestData.NEW_RACE;
+import static holymagic.typeservice.service.RaceTestData.OUTDATED_RACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class RaceCacheTest {
@@ -27,91 +28,115 @@ public class RaceCacheTest {
         raceCache = new RaceCache();
         ReflectionTestUtils.setField(raceCache, "capacity", 5);
         ReflectionTestUtils.setField(raceCache, "upperBound", 3);
-        races = RaceServiceTestData.provideRaces();
-        raceCache.add(races);
+        races = RaceTestData.provideRaces();
+        raceCache.update(races);
     }
 
     @AfterEach
     void tearDown() {
-        raceCache.clear();
+        clearCache();
     }
 
     @Test
-    public void addTest() {
-        assertEquals(3, raceCache.getSize());
-        assertEquals(races.get(0), raceCache.getById("fi35d345"));
-        assertEquals(races.get(1), raceCache.getById("298k39g0"));
-        assertEquals(races.get(2), raceCache.getById("3in60nf9"));
+    public void getTest() {
+        Race actualRace = raceCache.get(1767014109000L);
+        Race expectedRace = races.get(0);
+        assertEquals(expectedRace, actualRace);
+    }
+
+    @Test
+    public void getByAbsentTimestampTest() {
+        Race actualRace = raceCache.get(1767014108000L);
+        assertNull(actualRace);
     }
 
     @Test
     public void getByIdTest() {
-        Race actualRace = raceCache.getById(races.getFirst().getId());
-        assertEquals(races.getFirst(), actualRace);
+        Race actualRace = raceCache.getById("fi35d345");
+        Race expectedRace = races.get(0);
+        assertEquals(expectedRace, actualRace);
+    }
+
+    @Test
+    public void getByAbsentIdTest() {
+        Race actualRace = raceCache.getById("fi35d345_");
+        assertNull(actualRace);
+    }
+
+    @Test
+    public void getListTest() {
+        List<Race> actualRaces = raceCache.get(3);
+        List<Race> expectedRaces = races.subList(0,3);
+        assertEquals(expectedRaces, actualRaces);
+    }
+
+    @Test
+    public void getListWithGreaterCapacityTest() {
+        List<Race> actualRaces = raceCache.get(10);
+        List<Race> expectedRaces = races;
+        assertEquals(expectedRaces, actualRaces);
+    }
+
+    @Test
+    public void addTest() {
+        assertNull(raceCache.get(1767014115000L));
+        assertNotNull(raceCache.get(1767014109000L));
+        assertEquals(5, raceCache.getSize());
+        raceCache.add(NEW_RACE);
+        assertEquals(NEW_RACE, raceCache.get(1767014115000L));
+        assertEquals(5, raceCache.getSize());
+        assertNull(raceCache.get(1767014109000L));
+    }
+
+    @Test
+    public void addOutdatedTest() {
+        assertNull(raceCache.get(1767014108000L));
+        assertEquals(5, raceCache.getSize());
+        raceCache.add(OUTDATED_RACE);
+        assertNull(raceCache.get(1767014108000L));
+        assertEquals(5, raceCache.getSize());
+    }
+
+    @Test
+    public void clearTest() {
+        assertEquals(5, raceCache.getSize());
+        clearCache();
+        assertEquals(0, raceCache.getSize());
     }
 
     @Test
     public void getAllTest() {
         List<Race> actualRaces = raceCache.getAll();
-        List<Race> expectedRaces = races.stream()
-                .sorted(Comparator.comparingLong(Race::getTimestamp).reversed())
-                .toList();
+        List<Race> expectedRaces = races;
         assertEquals(expectedRaces, actualRaces);
     }
 
     @Test
-    public void getLastAndFirstTest() {
-        Race actualFirst = raceCache.getFirst();
-        Race actualLast = raceCache.getLast();
-        Race expectedFirst = races.get(0);
-        Race expectedLast = races.get(2);
-        assertEquals(expectedFirst, actualFirst);
-        assertEquals(expectedLast, actualLast);
+    public void getSizeTest() {
+        assertEquals(races.size(), raceCache.getSize());
     }
 
     @Test
-    public void getTest() {
-        List<Long> timestamps = races.stream().map(Race::getTimestamp).toList();
-        assertNotNull(raceCache.get(timestamps.get(0)));
-        assertNotNull(raceCache.get(timestamps.get(1)));
-        assertNotNull(raceCache.get(timestamps.get(2)));
-        assertNull(raceCache.get(15000L));
+    public void getLatestTest() {
+        Race actualRace = raceCache.getLastestRace();
+        Race expectedRace = races.get(raceCache.getSize() - 1);
+        assertEquals(expectedRace, actualRace);
     }
 
     @Test
-    public void removeTest() {
+    public void removeOldRacesTest() {
+        assertNotNull(raceCache.get(1767014109000L));
+        assertNotNull(raceCache.get(1767014110000L));
+        assertEquals(5, raceCache.getSize());
+        raceCache.removeOldRaces();
         assertEquals(3, raceCache.getSize());
-        raceCache.remove(1767014120000L);
-        assertEquals(2, raceCache.getSize());
+        assertNull(raceCache.get(1767014109000L));
+        assertNull(raceCache.get(1767014110000L));
     }
 
-    @Test
-    public void removeByIdTest() {
-        assertEquals(3, raceCache.getSize());
-        raceCache.removeById("3in60nf9");
-        assertEquals(2, raceCache.getSize());
-    }
-
-    @Test
-    public void removeMoreThanOneTest() {
-        assertEquals(3, raceCache.getSize());
-        raceCache.remove(2);
-        assertEquals(1, raceCache.getSize());
-    }
-
-    @Test
-    public void removeMoreThanSizeTest() {
-        assertEquals(3, raceCache.getSize());
-        raceCache.remove(4);
-        assertEquals(3, raceCache.getSize());
-    }
-
-    @Test
-    public void removeWithInvalidArgTest() {
-        assertEquals(3, raceCache.getSize());
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> raceCache.get(-1));
-        assertEquals("quantity must be greater than 0", exception.getMessage());
-        assertEquals(3, raceCache.getSize());
+    public void clearCache() {
+        Map<?,?> cache = (Map<?,?>) ReflectionTestUtils.getField(raceCache, "cache");
+        cache.clear();
     }
 
 }

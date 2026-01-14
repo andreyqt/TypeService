@@ -60,11 +60,4 @@ public class LeaderboardController {
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
     }
 
-    @Operation(summary = "Saves top 250 players in english language for 60s in db")
-    @PostMapping("/db/save/all")
-    public ResponseEntity<String> saveLeaderboardFromCache() {
-        leaderboardService.saveLeaderboardFromCache();
-        return ResponseEntity.ok("Leaderboard has been saved");
-    }
-
 }

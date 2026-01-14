@@ -1,120 +1,98 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.race.Race;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-@Service
+@Component
 public class RaceCache {
 
     @Value("${race_cache_size}")
     private int capacity;
 
     @Value("${race_cache_bound}")
+    @Getter
     private int upperBound;
 
-    private static final TreeMap<Long, Race> CACHE = new TreeMap<>(Comparator.reverseOrder());
+    private final ConcurrentSkipListMap<Long, Race> cache =
+            new ConcurrentSkipListMap<>(Comparator.reverseOrder());
+    private final AtomicBoolean updating = new AtomicBoolean(false);
+
 
     public Race get(Long timestamp) {
-        return CACHE.get(timestamp);
+        return cache.get(timestamp);
     }
 
     public Race getById(String id) {
-        return CACHE.values()
-                .stream()
-                .dropWhile(race -> !race.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        for (Race race : cache.values()) {
+            if (race.getId().equals(id)) {
+                return race;
+            }
+        }
+        return null;
     }
 
     public List<Race> get(int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("quantity must be greater than 0");
+            return cache.descendingMap()
+                    .values()
+                    .stream()
+                    .limit(Math.min(quantity, cache.size()))
+                    .toList();
         }
-        return CACHE.values()
-                .stream().
-                limit(Math.min(quantity, CACHE.size()))
-                .toList();
 
-    }
-
-    public void add(Race race) {
-        CACHE.putIfAbsent(race.getTimestamp(), race);
-    }
-
-    public void add(List<Race> races) {
-        if (races == null || races.isEmpty()) {
-            return;
-        }
-        if (races.size() > capacity) {
-            log.warn("An attempt was made to add more races than allowed!");
-        } else {
-            for (Race race : races) {
-                add(race);
+        public void add (Race race){
+            if (race.getTimestamp() > cache.lastKey()) {
+                if (cache.size() >= capacity) {
+                    cache.remove(cache.lastKey());
+                }
+                cache.putIfAbsent(race.getTimestamp(), race);
             }
-            log.info("Added {} races to cache", races.size());
-            removeExcess();
         }
-    }
 
-    public void remove(Long timestamp) {
-        CACHE.remove(timestamp);
-    }
-
-    public void removeById(String id) {
-        CACHE.entrySet().removeIf(entry -> entry.getValue().getId().equals(id));
-    }
-
-    public void remove(int quantity) {
-        if (quantity > CACHE.size()) {
-            log.warn("An attempt was made to remove more than allowed!");
-        }
-        else {
-            for (int i = 0; i < quantity; i++) {
-                CACHE.remove(CACHE.lastKey());
+        public void update (List < Race > races) {
+            if (updating.compareAndSet(false, true)) {
+                try {
+                    cache.clear();
+                    for (Race race : races) {
+                        cache.put(race.getTimestamp(), race);
+                        log.info("cache has been updated");
+                    }
+                } catch (Exception e) {
+                    log.error("failed to update race cache", e);
+                } finally {
+                    updating.set(false);
+                }
+            } else {
+                log.info("cache is already updating");
             }
-            log.info("Removed {} races, current size is {}", quantity, CACHE.size());
         }
-    }
 
-    public List<Race> getAll() {
-        return new ArrayList<>(CACHE.values());
-    }
-
-    public int getSize() {
-        return CACHE.size();
-    }
-
-    public Race getLast() {
-        return CACHE.firstEntry().getValue();
-    }
-
-    public Race getFirst() {
-        return CACHE.lastEntry().getValue();
-    }
-
-    public void removeOldRaces() {
-        while (CACHE.size() > upperBound) {
-            CACHE.remove(CACHE.lastKey());
+        public List<Race> getAll () {
+            return new ArrayList<>(cache.descendingMap().values());
         }
-    }
 
-    public void clear() {
-        CACHE.clear();
-    }
-
-    private void removeExcess() {
-        while (CACHE.size() > capacity) {
-            CACHE.remove(CACHE.lastKey());
+        public int getSize () {
+            return cache.size();
         }
-        log.info("Excess from race cache was removes");
-    }
 
-}
+        public Race getLastestRace () {
+            return cache.firstEntry().getValue();
+        }
+
+        public void removeOldRaces () {
+            while (cache.size() > upperBound) {
+                cache.remove(cache.lastKey());
+            }
+            log.info("Cache has been normalized");
+        }
+
+    }

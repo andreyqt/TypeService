@@ -14,12 +14,18 @@ public class AsyncConfig {
     public ThreadPoolTaskExecutor cacheExecutor(
             @Value("${async_core_pool_size}") int corePoolSize,
             @Value("${async_max_pool_size}") int maxPoolSize,
-            @Value("${async_queue_capacity}") int queueCapacity
+            @Value("${async_queue_capacity}") int queueCapacity,
+            @Value("${keep_alive_seconds}") int keepAliveSeconds,
+            @Value("${await_termination}") int waitTerminationSeconds
     ) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);
         executor.setQueueCapacity(queueCapacity);
+        executor.setKeepAliveSeconds(keepAliveSeconds);
+        executor.setThreadNamePrefix("async-pool-cache");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(waitTerminationSeconds);
         executor.initialize();
         return executor;
     }

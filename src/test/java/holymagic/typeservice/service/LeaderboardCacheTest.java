@@ -32,44 +32,6 @@ public class LeaderboardCacheTest {
         leaderboardCache.clear();
     }
 
-    @Test
-    public void addTest() {
-        List<RankedRace> races = provideRankedRaces(250);
-        leaderboardCache.add(races);
-        int actualSize = leaderboardCache.getSize();
-        assertEquals(250, actualSize);
-        for (int i = 0; i < actualSize; i++) {
-            assertEquals(races.get(i), leaderboardCache.getRace(i+1));
-        }
-    }
-
-    @Test
-    public void addMoreThanAllowedTest() {
-        List<RankedRace> races = provideRankedRaces(300);
-        String expectedMsg = String.format("can't add more than %d races", testCapacity);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> leaderboardCache.add(races));
-        assertEquals(expectedMsg, exception.getMessage());
-    }
-
-    @Test
-    public void addLowRanksTest() {
-        List<RankedRace> races = provideRankedRaces(100);
-        List<RankedRace> racesWithLowRanks = provideLowRankRaces(100);
-        leaderboardCache.add(races);
-        leaderboardCache.add(racesWithLowRanks);
-        int actualSize = leaderboardCache.getSize();
-        assertEquals(100, actualSize);
-    }
-
-    @Test
-    public void clearTest() {
-        List<RankedRace> races = provideRankedRaces(100);
-        leaderboardCache.add(races);
-        assertEquals(100, leaderboardCache.getSize());
-        leaderboardCache.clear();
-        assertEquals(0, leaderboardCache.getSize());
-    }
-
     public static List<RankedRace> provideRankedRaces(int quantity) {
         List<RankedRace> rankedRaces = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {

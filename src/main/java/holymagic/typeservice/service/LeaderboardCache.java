@@ -18,10 +18,6 @@ public class LeaderboardCache {
 
     private static final TreeMap<Integer, RankedRace> LEADERBOARDS = new TreeMap<>();
 
-    public int getSize() {
-        return LEADERBOARDS.size();
-    }
-
     public RankedRace getRace(int rank) {
         return LEADERBOARDS.get(rank);
     }
@@ -30,18 +26,19 @@ public class LeaderboardCache {
         return new ArrayList<>(LEADERBOARDS.values());
     }
 
+    public void update(List<RankedRace> races) {
+        LEADERBOARDS.clear();
+        for (RankedRace race : races) {
+            LEADERBOARDS.put(race.getRank(), race);
+        }
+    }
+
     public void clear() {
         LEADERBOARDS.clear();
     }
 
-    public void add(List<RankedRace> races) {
-        if (races.size() > capacity) {
-            throw new IllegalArgumentException(String.format("can't add more than %d races", capacity));
-        }
-        for (RankedRace race : races) {
-            if (race.getRank() <= capacity)
-                LEADERBOARDS.put(race.getRank(), race);
-        }
+    public int getSize() {
+        return LEADERBOARDS.size();
     }
 
 }
