@@ -32,11 +32,6 @@ public class RaceCacheTest {
         raceCache.update(races);
     }
 
-    @AfterEach
-    void tearDown() {
-        clearCache();
-    }
-
     @Test
     public void getTest() {
         Race actualRace = raceCache.get(1767014109000L);
