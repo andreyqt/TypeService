@@ -41,7 +41,6 @@ public class LeaderboardService {
     private final LeaderboardValidator leaderboardValidator;
     private final WeeklyActivityMapper weeklyActivityMapper;
     private final LeaderboardCache leaderboardCache;
-    private final RankedRaceRepository rankedRaceRepository;
 
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,

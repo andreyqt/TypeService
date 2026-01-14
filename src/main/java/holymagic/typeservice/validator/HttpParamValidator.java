@@ -21,7 +21,7 @@ public class HttpParamValidator {
         if (timestamp < initialTimestamp) {
             throw new DataValidationException("timestamp must be >= " + initialTimestamp);
         }
-        Long currentTimestamp = System.currentTimeMillis();
+        long currentTimestamp = System.currentTimeMillis();
         if (timestamp > currentTimestamp) {
             throw new DataValidationException("timestamp is not reached yet");
         }
