@@ -29,7 +29,7 @@ public class LeaderboardCache {
     }
 
     public List<RankedRace> getAll() {
-        return new ArrayList<>(cache.values());
+        return new ArrayList<>(cache.descendingMap().values());
     }
 
     public void update(List<RankedRace> races) {
