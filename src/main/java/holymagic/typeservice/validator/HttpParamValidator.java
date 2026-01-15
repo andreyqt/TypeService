@@ -4,6 +4,9 @@ import holymagic.typeservice.exception.DataValidationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static holymagic.typeservice.model.Modes.ALLOWED_LANGUAGES;
+import static holymagic.typeservice.model.Modes.ALLOWED_MODES;
+
 @Component
 public class HttpParamValidator {
 
@@ -28,26 +31,38 @@ public class HttpParamValidator {
     }
 
     public void validateOffset(Integer offset) {
-        if (offset < 0 || offset > maxLimit) {
+        if (offset < 0 || offset >= maxLimit) {
             throw new DataValidationException("offset can't be negative or exceed " + maxLimit);
         }
     }
 
     public void validateLimit(Integer limit) {
         if (limit <= 0 || limit > maxLimit) {
-            throw new IllegalArgumentException("limit must be between 0 and " + maxLimit);
+            throw new DataValidationException("limit must be between 0 and " + maxLimit);
         }
     }
 
     public void validatePageNumber(int page) {
         if (page < 0 || page > maxPageNumber) {
-            throw new IllegalArgumentException("Invalid page number: " + page);
+            throw new DataValidationException("Invalid page number: " + page);
         }
     }
 
     public void validatePageSize(int pageSize) {
         if (pageSize < 1 || pageSize > maxPageSize)
-            throw new IllegalArgumentException("Invalid page size: " + pageSize);
+            throw new DataValidationException("Invalid page size: " + pageSize);
+    }
+
+    public void validatePublicDataArgs(String language, String mode, String mode2) {
+        if (!ALLOWED_LANGUAGES.contains(language)) {
+            throw new DataValidationException("can't provide information for given language: " + language);
+        }
+        if (!ALLOWED_MODES.containsKey(mode)) {
+            throw new DataValidationException("can't provide information for given mode: " + mode);
+        }
+        if (!ALLOWED_MODES.get(mode).contains(mode2)) {
+            throw new DataValidationException("illegal mode combination: " + mode + " + " + mode2);
+        }
     }
 
 }

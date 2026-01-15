@@ -1,7 +1,7 @@
-package holymagic.typeservice.service;
+package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.race.Race;
-import org.junit.jupiter.api.AfterEach;
+import holymagic.typeservice.service.ServiceTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +11,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Map;
 
-import static holymagic.typeservice.service.RaceTestData.NEW_RACE;
-import static holymagic.typeservice.service.RaceTestData.OUTDATED_RACE;
+import static holymagic.typeservice.service.ServiceTestData.NEW_RACE;
+import static holymagic.typeservice.service.ServiceTestData.OUTDATED_RACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,8 +28,8 @@ public class RaceCacheTest {
         raceCache = new RaceCache();
         ReflectionTestUtils.setField(raceCache, "capacity", 5);
         ReflectionTestUtils.setField(raceCache, "upperBound", 3);
-        races = RaceTestData.provideRaces();
-        raceCache.update(races);
+        races = ServiceTestData.provideRaces();
+        raceCache.initialize(races);
     }
 
     @Test

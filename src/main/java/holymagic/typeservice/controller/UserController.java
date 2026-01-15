@@ -4,6 +4,7 @@ import holymagic.typeservice.dto.CheckNameDto;
 import holymagic.typeservice.dto.CurrentTestActivityDto;
 import holymagic.typeservice.dto.PersonalBestDto;
 import holymagic.typeservice.dto.StreakDto;
+import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.Stats;
 import holymagic.typeservice.service.UserService;
@@ -22,11 +23,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
+
     private final UserService userService;
 
-    @Operation(summary = "Checks to see if a username is available")
+    @Operation(summary = "Checks if the username available")
     @GetMapping("/checkName/{name}")
-    public ResponseEntity<CheckNameDto> checkName(@PathVariable String name) {
+    public ResponseEntity<CheckName> checkName(@PathVariable String name) {
         return ResponseEntity.ok(userService.checkName(name));
     }
 
