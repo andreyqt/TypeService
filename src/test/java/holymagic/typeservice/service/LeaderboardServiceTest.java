@@ -1,13 +1,15 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.cache.LeaderboardCache;
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.mapper.RankedRaceMapperImpl;
 import holymagic.typeservice.mapper.WeeklyActivityMapperImpl;
-import holymagic.typeservice.validator.LeaderboardValidator;
-import holymagic.typeservice.validator.PublicDataValidator;
-import jakarta.ws.rs.NotFoundException;
-import org.junit.jupiter.api.Assertions;
+import holymagic.typeservice.model.leaderboard.Leaderboard;
+import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.model.leaderboard.WeeklyActivity;
+import holymagic.typeservice.model.leaderboard.XpLeaderboard;
+import holymagic.typeservice.validator.HttpParamValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +19,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.util.List;
@@ -26,139 +26,98 @@ import java.util.List;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LEADERBOARD_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.RANKED_RACE_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.XP_LEADERBOARD_REF;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_DAILY_LEADERBOARD_URI;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_LEADERBOARD_URI;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_LEADERBOARD_URI_WITH_ALL_PARAMS;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_RANK_URI;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_XP_LEADERBOARD_URI;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_NOT_FOUND_EXCEPTION_MSG;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_NOT_FOUND_EXCEPTION_RANK_MSG;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.LEADERBOARD_FRIENDS_ONLY_RESPONSE;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.LEADERBOARD_NULL_RESPONSE;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.LEADERBOARD_RESPONSE;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.RANKED_RACE_NULL_RESPONSE;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.RANKED_RACE_RESPONSE;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.XP_LEADERBOARD_RESPONSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class LeaderboardServiceTest {
+
+    @InjectMocks
+    private LeaderboardService leaderboardService;
+
     @Mock
-    private RestClient restClient;
-    @Mock
-    private LeaderboardCache leaderboardCache;
+    private HttpParamValidator httpParamValidator;
     @Spy
     private RankedRaceMapperImpl rankedRaceMapper;
     @Spy
     private WeeklyActivityMapperImpl weeklyActivityMapper;
-    @Spy
-    private PublicDataValidator publicDataValidator;
-    @Spy
-    private LeaderboardValidator leaderboardValidator = new LeaderboardValidator();
-    @InjectMocks
-    private LeaderboardService leaderboardService;
     @Mock
-    private RestClient.RequestHeadersSpec requestHeadersSpec;
+    private LeaderboardCache leaderboardCache;
     @Mock
-    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
-    @Mock
-    private RestClient.ResponseSpec responseSpec;
-    private ArgumentCaptor<URI> uriCaptor;
+    private ExchangeService exchangeService;
+
+    ArgumentCaptor<URI> uriCaptor;
+    List<RankedRace> rankedRaces;
+    List<RankedRaceDto> rankedRaceDtos;
+    Leaderboard leaderboard;
 
     @BeforeEach
     void setUp() {
-        publicDataValidator = new PublicDataValidator();
-        ReflectionTestUtils.setField(leaderboardValidator, "maxPageNumber", 1000);
-        ReflectionTestUtils.setField(leaderboardValidator, "maxPageSize", 200);
         uriCaptor = ArgumentCaptor.forClass(URI.class);
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        rankedRaces = LeaderboardServiceTestData.provideRankedRaces();
+        rankedRaceDtos = LeaderboardServiceTestData.provideRankedRaceDtos();
+        leaderboard = new Leaderboard(rankedRaces.size(), rankedRaces);
     }
 
     @Test
     public void getLeaderboardTest() {
-        when(leaderboardCache.getAll()).thenReturn(null);
-        when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_RESPONSE);
-        List<RankedRaceDto> actualDtoList = leaderboardService.getLeaderboard("english", "time",
-                "60", null, null, null);
-        verifyRestClientActions(LEADERBOARD_REF, EXPECTED_GET_LEADERBOARD_URI);
-        List<RankedRaceDto> expectedDtoList = LeaderboardServiceTestData.provideRankedRacesDto();
-        assertEquals(expectedDtoList, actualDtoList);
-    }
+        URI expectedUri = URI.create("/leaderboards?language=english&mode=time&mode2=60");
+        when(exchangeService.makeGetRequest(any(URI.class), eq(LEADERBOARD_REF))).thenReturn(leaderboard);
 
-    @Test
-    public void getLeaderboardWithNullDataTest() {
-        when(leaderboardCache.getAll()).thenReturn(null);
-        when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_NULL_RESPONSE);
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            leaderboardService.getLeaderboard("english",
-                    "time", "60", null, null, null);
-        });
-        Assertions.assertEquals(EXPECTED_NOT_FOUND_EXCEPTION_MSG, exception.getMessage());
-    }
-
-    @Test
-    public void getLeaderboardsForFriendsOnly() {
-        when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_FRIENDS_ONLY_RESPONSE);
-        List<RankedRaceDto> actualDtoList = leaderboardService.getLeaderboard("english", "time",
-                "60", 0, 3, true);
-        verifyRestClientActions(LEADERBOARD_REF, EXPECTED_GET_LEADERBOARD_URI_WITH_ALL_PARAMS);
-        List<RankedRaceDto> expectedDtoList = LeaderboardServiceTestData.provideRankedRacesDtoForFriendsOnly();
-        assertEquals(expectedDtoList, actualDtoList);
+        List<RankedRaceDto> actualDtos = leaderboardService.getLeaderboard("english", "time", "60",
+                null, null, null);
+        assertEquals(rankedRaceDtos, actualDtos);
+        verifyExchange(expectedUri, LEADERBOARD_REF);
+        verify(leaderboardCache, times(0)).getAll();
+        verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
     }
 
     @Test
     public void getRankTest() {
-        when(responseSpec.body(RANKED_RACE_REF)).thenReturn(RANKED_RACE_RESPONSE);
-        RankedRaceDto actualRankedDto = leaderboardService.getRank("english", "time", "60",
-                null);
-        verifyRestClientActions(RANKED_RACE_REF, EXPECTED_GET_RANK_URI);
-        RankedRaceDto expectedRankedDto = LeaderboardServiceTestData.provideRankedRaceDto();
-        assertEquals(expectedRankedDto, actualRankedDto);
-    }
+        URI expectedUri = URI.create("/leaderboards/rank?language=english&mode=time&mode2=60");
+        when(exchangeService.makeGetRequest(any(URI.class), eq(RANKED_RACE_REF))).thenReturn(rankedRaces.getFirst());
 
-    @Test
-    public void getRankWithNullDataTest() {
-        when(responseSpec.body(RANKED_RACE_REF)).thenReturn(RANKED_RACE_NULL_RESPONSE);
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            leaderboardService.getRank("english",
-                    "time", "60", null);
-        });
-        Assertions.assertEquals(EXPECTED_NOT_FOUND_EXCEPTION_RANK_MSG, exception.getMessage());
+        RankedRaceDto actualDto = leaderboardService.getRank("english", "time", "60",
+                null);
+        assertEquals(rankedRaceDtos.getFirst(), actualDto);
+        verifyExchange(expectedUri, RANKED_RACE_REF);
+        verify(rankedRaceMapper, times(1)).toDto(rankedRaces.getFirst());
     }
 
     @Test
     public void getDailyLeaderboardTest() {
-        when(responseSpec.body(LEADERBOARD_REF)).thenReturn(LEADERBOARD_RESPONSE);
-        List<RankedRaceDto> actualDtoList = leaderboardService.getDailyLeaderboard("english", "time",
+        URI expectedUri = URI.create("/leaderboards/daily?language=english&mode=time&mode2=60");
+        when(exchangeService.makeGetRequest(any(URI.class), eq(LEADERBOARD_REF))).thenReturn(leaderboard);
+
+        List<RankedRaceDto> actualDtos = leaderboardService.getDailyLeaderboard("english", "time",
                 "60", null, null, null);
-        verifyRestClientActions(LEADERBOARD_REF, EXPECTED_GET_DAILY_LEADERBOARD_URI);
-        List<RankedRaceDto> expectedDtoList = LeaderboardServiceTestData.provideRankedRacesDto();
-        assertEquals(expectedDtoList, actualDtoList);
+        assertEquals(rankedRaceDtos, actualDtos);
+        verifyExchange(expectedUri, LEADERBOARD_REF);
+        verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
     }
 
     @Test
-    public void getWeeklyXpLeaderboardTest() {
-        when(responseSpec.body(XP_LEADERBOARD_REF)).thenReturn(XP_LEADERBOARD_RESPONSE);
-        List<WeeklyActivityDto> actualDtoList = leaderboardService.getWeeklyXpLeaderboard(null,
-                null, null);
-        verifyRestClientActions(XP_LEADERBOARD_REF, EXPECTED_GET_XP_LEADERBOARD_URI);
-        List<WeeklyActivityDto> expectedDtoList = LeaderboardServiceTestData.provideWeeklyActivitiesDto();
-        assertEquals(expectedDtoList, actualDtoList);
+    public void getWeeklyXpActivityTest() {
+        URI expectedUri =  URI.create("/leaderboards/xp/weekly");
+        List<WeeklyActivity> activity = LeaderboardServiceTestData.provideWeeklyActivity();
+        List<WeeklyActivityDto> expectedActivity = LeaderboardServiceTestData.provideWeeklyActivityDtos();
+        XpLeaderboard xpLeaderboard = new XpLeaderboard(activity.size(), activity);
+        when(exchangeService.makeGetRequest(any(URI.class), eq(XP_LEADERBOARD_REF))).thenReturn(xpLeaderboard);
+
+        List<WeeklyActivityDto> actualActivity = leaderboardService.getWeeklyXpLeaderboard(null, null,
+                null);
+        assertEquals(expectedActivity, actualActivity);
+        verifyExchange(expectedUri, XP_LEADERBOARD_REF);
+        verify(weeklyActivityMapper, times(1)).toDto(activity);
     }
 
-    public void verifyRestClientActions(ParameterizedTypeReference reference, URI expectedUri) {
-        verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).body(reference);
-        URI capturedUri = uriCaptor.getValue();
-        assertEquals(expectedUri, capturedUri);
+    public void verifyExchange(URI expectedUri, ParameterizedTypeReference reference) {
+        verify(exchangeService, times(1)).makeGetRequest(uriCaptor.capture(), eq(reference));
+        assertEquals(expectedUri, uriCaptor.getValue());
     }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/v1/races")
 @RequiredArgsConstructor
 public class RaceController {
+
     private final RaceService raceService;
 
     @Operation(summary = "Gets up to 1000 results, if all params are null, then returns races from cache")

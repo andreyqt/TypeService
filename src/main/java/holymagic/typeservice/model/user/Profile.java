@@ -16,7 +16,7 @@ import java.util.Map;
 public class Profile {
     private String name;
     private Long addedAt;
-    private Stats typingStats;
+    private UserStats typingStats;
     private Map<String, Map<String, List<PersonalBest>>> personalBests;
     private Long discordId;
     private String discordAvatar;

@@ -1,7 +1,7 @@
-package holymagic.typeservice.service;
+package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.race.Race;
-import org.junit.jupiter.api.AfterEach;
+import holymagic.typeservice.service.RaceServiceTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +11,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Map;
 
-import static holymagic.typeservice.service.RaceTestData.NEW_RACE;
-import static holymagic.typeservice.service.RaceTestData.OUTDATED_RACE;
+import static holymagic.typeservice.service.RaceServiceTestData.NEW_RACE;
+import static holymagic.typeservice.service.RaceServiceTestData.OUTDATED_RACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,8 +28,8 @@ public class RaceCacheTest {
         raceCache = new RaceCache();
         ReflectionTestUtils.setField(raceCache, "capacity", 5);
         ReflectionTestUtils.setField(raceCache, "upperBound", 3);
-        races = RaceTestData.provideRaces();
-        raceCache.update(races);
+        races = RaceServiceTestData.provideRaces();
+        raceCache.initialize(races);
     }
 
     @Test
@@ -47,14 +47,14 @@ public class RaceCacheTest {
 
     @Test
     public void getByIdTest() {
-        Race actualRace = raceCache.getById("fi35d345");
+        Race actualRace = raceCache.getById("test_id_1");
         Race expectedRace = races.get(0);
         assertEquals(expectedRace, actualRace);
     }
 
     @Test
     public void getByAbsentIdTest() {
-        Race actualRace = raceCache.getById("fi35d345_");
+        Race actualRace = raceCache.getById("invalid_id");
         assertNull(actualRace);
     }
 

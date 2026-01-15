@@ -1,13 +1,14 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.cache.RaceCache;
 import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
 import holymagic.typeservice.validator.HttpParamValidator;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.util.List;
@@ -133,20 +133,22 @@ public class RaceService {
         log.info("{} races were saved to db", races.size());
     }
 
+    @PostConstruct
+    public void initializeCache() {
+        List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
+        raceCache.initialize(races);
+    }
+
     @Async("cacheUpdateExecutor")
-    @Scheduled(fixedRateString = "${cache_update_interval}m")
-    public void updateCache() {
-        int size = raceCache.getSize();
-        URI uri = UriBuilder.fromPath("/results")
-                .queryParam("limit", size)
-                .build();
-        List<Race> races = exchangeService.makeGetRequest(uri, LIST_OF_RACES_REF);
+    @Scheduled(cron = "${race_cache_update_interval}")
+    public void updateCacheAsync() {
+        List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
         raceCache.update(races);
     }
 
     @Async("cacheUpdateExecutor")
-    @Scheduled(fixedRateString = "${cache_removal_interval}m")
-    public void removeOldRaces() {
+    @Scheduled(cron = "${race_cache_remove_interval}")
+    public void removeOldRacesAsync() {
         raceCache.removeOldRaces();
     }
 
@@ -167,6 +169,12 @@ public class RaceService {
             builder.queryParam("limit", limit);
         }
         return builder.build();
+    }
+
+    private URI createCacheUpdateUri() {
+        return UriBuilder.fromPath("/results")
+                .queryParam("limit", raceCache.getCapacity())
+                .build();
     }
 
 }

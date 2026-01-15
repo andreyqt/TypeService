@@ -1,5 +1,6 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.cache.RaceCache;
 import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.mapper.RaceMapperImpl;
@@ -48,16 +49,15 @@ public class RaceServiceTest {
     @InjectMocks
     private RaceService raceService;
 
-    private int defaultLimit;
     private List<Race> races;
     private List<RaceDto> raceDtos;
     private ArgumentCaptor<URI> uriCaptor;
 
     @BeforeEach
     void setUp() {
-        defaultLimit = 10;
-        races = RaceTestData.provideRaces();
-        raceDtos = RaceTestData.provideRaceDtos();
+        int defaultLimit = 10;
+        races = RaceServiceTestData.provideRaces();
+        raceDtos = RaceServiceTestData.provideRaceDtos();
         uriCaptor = ArgumentCaptor.forClass(URI.class);
         ReflectionTestUtils.setField(raceService, "defaultLimit", defaultLimit);
     }
