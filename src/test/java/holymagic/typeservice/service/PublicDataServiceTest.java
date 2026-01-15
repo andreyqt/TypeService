@@ -37,7 +37,7 @@ public class PublicDataServiceTest {
 
     @Test
     public void getSpeedHistogramTest() {
-        Map<String, Integer> speedHistogram = ServiceTestData.provideHistogram();
+        Map<String, Integer> speedHistogram = PublicDataServiceTestData.provideHistogram();
         URI expectedUri = URI.create("/public/speedHistogram?language=english&mode=time&mode2=60");
         when(exchangeService.makeGetRequest(any(URI.class), eq(SPEED_HISTOGRAM_REF))).thenReturn(speedHistogram);
         Map<String, Integer> actualHistogram = publicDataService.getSpeedHistogram("english", "time", "60");
@@ -47,7 +47,7 @@ public class PublicDataServiceTest {
 
     @Test
     public void getTypingStatsTest() {
-        TypingStats expectedStats = ServiceTestData.provideTypingStats();
+        TypingStats expectedStats = PublicDataServiceTestData.provideTypingStats();
         URI expectedUri = URI.create("/public/typingStats");
         when(exchangeService.makeGetRequest(any(URI.class), eq(TYPING_STATS_REF))).thenReturn(expectedStats);
         TypingStats actualStats = publicDataService.getTypingStats();

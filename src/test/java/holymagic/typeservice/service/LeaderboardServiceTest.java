@@ -58,8 +58,8 @@ public class LeaderboardServiceTest {
     @BeforeEach
     void setUp() {
         uriCaptor = ArgumentCaptor.forClass(URI.class);
-        rankedRaces = ServiceTestData.provideRankedRaces();
-        rankedRaceDtos = ServiceTestData.provideRankedRaceDtos();
+        rankedRaces = LeaderboardServiceTestData.provideRankedRaces();
+        rankedRaceDtos = LeaderboardServiceTestData.provideRankedRaceDtos();
         leaderboard = new Leaderboard(rankedRaces.size(), rankedRaces);
     }
 
@@ -71,7 +71,6 @@ public class LeaderboardServiceTest {
         List<RankedRaceDto> actualDtos = leaderboardService.getLeaderboard("english", "time", "60",
                 null, null, null);
         assertEquals(rankedRaceDtos, actualDtos);
-
         verifyExchange(expectedUri, LEADERBOARD_REF);
         verify(leaderboardCache, times(0)).getAll();
         verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
@@ -80,14 +79,13 @@ public class LeaderboardServiceTest {
     @Test
     public void getRankTest() {
         URI expectedUri = URI.create("/leaderboards/rank?language=english&mode=time&mode2=60");
-        when(exchangeService.makeGetRequest(any(URI.class), eq(RANKED_RACE_REF))).thenReturn(rankedRaces.get(0));
+        when(exchangeService.makeGetRequest(any(URI.class), eq(RANKED_RACE_REF))).thenReturn(rankedRaces.getFirst());
 
         RankedRaceDto actualDto = leaderboardService.getRank("english", "time", "60",
                 null);
-        assertEquals(rankedRaceDtos.get(0), actualDto);
-
+        assertEquals(rankedRaceDtos.getFirst(), actualDto);
         verifyExchange(expectedUri, RANKED_RACE_REF);
-        verify(rankedRaceMapper, times(1)).toDto(rankedRaces.get(0));
+        verify(rankedRaceMapper, times(1)).toDto(rankedRaces.getFirst());
     }
 
     @Test
@@ -98,7 +96,6 @@ public class LeaderboardServiceTest {
         List<RankedRaceDto> actualDtos = leaderboardService.getDailyLeaderboard("english", "time",
                 "60", null, null, null);
         assertEquals(rankedRaceDtos, actualDtos);
-
         verifyExchange(expectedUri, LEADERBOARD_REF);
         verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
     }
@@ -106,14 +103,13 @@ public class LeaderboardServiceTest {
     @Test
     public void getWeeklyXpActivityTest() {
         URI expectedUri =  URI.create("/leaderboards/xp/weekly");
-        List<WeeklyActivity> activity = ServiceTestData.provideWeeklyActivity();
-        List<WeeklyActivityDto> expectedActivity = ServiceTestData.provideWeeklyActivityDtos();
+        List<WeeklyActivity> activity = LeaderboardServiceTestData.provideWeeklyActivity();
+        List<WeeklyActivityDto> expectedActivity = LeaderboardServiceTestData.provideWeeklyActivityDtos();
         XpLeaderboard xpLeaderboard = new XpLeaderboard(activity.size(), activity);
         when(exchangeService.makeGetRequest(any(URI.class), eq(XP_LEADERBOARD_REF))).thenReturn(xpLeaderboard);
 
         List<WeeklyActivityDto> actualActivity = leaderboardService.getWeeklyXpLeaderboard(null, null,
                 null);
-
         assertEquals(expectedActivity, actualActivity);
         verifyExchange(expectedUri, XP_LEADERBOARD_REF);
         verify(weeklyActivityMapper, times(1)).toDto(activity);

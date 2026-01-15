@@ -9,7 +9,7 @@ import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
-import holymagic.typeservice.model.user.Stats;
+import holymagic.typeservice.model.user.UserStats;
 import holymagic.typeservice.model.user.Streak;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -21,13 +21,13 @@ public class ParameterizedTypeReferences {
     public static final ParameterizedTypeReference<Response<CheckName>> CHECK_NAME_REF =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<Response<Map<String, List<PersonalBest>>>> MAP_OF_LIST_OF_RECORDS =
+    public static final ParameterizedTypeReference<Response<Map<String, List<PersonalBest>>>> MAP_OF_RECORDS_REF =
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<List<PersonalBest>>> LIST_OF_RECORDS =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<Response<Stats>> STATS_REF =
+    public static final ParameterizedTypeReference<Response<UserStats>> USER_STATS_REF =
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<Profile>> PROFILE_REF =

@@ -1,9 +1,17 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.dto.CurrentTestActivityDto;
+import holymagic.typeservice.dto.PersonalBestDto;
+import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
+import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
+import holymagic.typeservice.model.user.CurrentTestActivity;
+import holymagic.typeservice.model.user.Profile;
+import holymagic.typeservice.model.user.Streak;
+import holymagic.typeservice.model.user.UserStats;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,8 +22,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.CURRENT_TEST_ACTIVITY_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RECORDS;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_RECORDS_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.PROFILE_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.STREAK_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.USER_STATS_REF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,14 +67,72 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getPersonalBestsTest() {
+    public void getPersonalBestsForTimeModeTest() {
         URI expectedUri = URI.create("/users/personalBests?mode=time");
-
+        Map<String, List<PersonalBest>> records = UserServiceTestData.providePersonalBestsForTimeMode();
+        Map<String, List<PersonalBestDto>> expectedRecords = UserServiceTestData.providePersonalBestDtosForTimeMode(records);
+        when(exchangeService.makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF))).thenReturn(records);
+        Map<String, List<PersonalBestDto>> actualRecords = userService.getPersonalBests("time");
+        assertEquals(expectedRecords, actualRecords);
+        verifyExchange(expectedUri, MAP_OF_RECORDS_REF);
     }
 
+    @Test
+    public void getPersonalBestForSpecificTimeModeTest() {
+        URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=30");
+        List<PersonalBest> records = UserServiceTestData.generatePersonalBests();
+        when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(records);
+        List<PersonalBestDto> actualRecords = userService.getPersonalBests("time", "30");
+        List<PersonalBestDto> expectedRecords = personalBestMapper.toDto(records);
+        assertEquals(expectedRecords, actualRecords);
+        verifyExchange(expectedUri, LIST_OF_RECORDS);
+    }
+
+    @Test
+    public void getUserStatsTest() {
+        URI expectedUri = URI.create("/users/stats");
+        UserStats stats = UserServiceTestData.provideUserStats();
+        when(exchangeService.makeGetRequest(any(URI.class), eq(USER_STATS_REF))).thenReturn(stats);
+        UserStats actualStats = userService.getUserStats();
+        assertEquals(stats, actualStats);
+        verifyExchange(expectedUri, USER_STATS_REF);
+    }
+
+    @Test
+    public void getProfileTest() {
+        URI expectedUri = URI.create("/users/test_name_123/profile");
+        Profile profile = UserServiceTestData.provideProfile();
+        when(exchangeService.makeGetRequest(any(URI.class), eq(PROFILE_REF))).thenReturn(profile);
+        Profile actualProfile = userService.getProfile("test_name_123");
+        assertEquals(profile, actualProfile);
+        verifyExchange(expectedUri, PROFILE_REF);
+    }
+
+    @Test
+    public void getCurrentTestActivityTest() {
+        URI expectedUri = URI.create("/users/currentTestActivity");
+        CurrentTestActivity activity = UserServiceTestData.provideCurrentTestActivity();
+        when(exchangeService.makeGetRequest(any(URI.class), eq(CURRENT_TEST_ACTIVITY_REF))).thenReturn(activity);
+        CurrentTestActivityDto expectedActivity = currentTestActivityMapper.toDto(activity);
+        CurrentTestActivityDto actualActivity = userService.getCurrentTestActivity();
+        assertEquals(expectedActivity, actualActivity);
+        verifyExchange(expectedUri, CURRENT_TEST_ACTIVITY_REF);
+    }
+
+    @Test
+    public void getStreakTest() {
+        URI expectedUri = URI.create("/users/streak");
+        Streak streak = UserServiceTestData.provideStreak();
+        when(exchangeService.makeGetRequest(any(URI.class), eq(STREAK_REF))).thenReturn(streak);
+        StreakDto actualStreak = userService.getStreak();
+        StreakDto expectedStreak = streakMapper.ToDto(streak);
+        assertEquals(expectedStreak, actualStreak);
+        verifyExchange(expectedUri, STREAK_REF);
+    }
 
     public void verifyExchange(URI expectedUri, ParameterizedTypeReference reference) {
         verify(exchangeService, times(1)).makeGetRequest(uriCaptor.capture(), eq(reference));
         assertEquals(expectedUri, uriCaptor.getValue());
     }
+
 }

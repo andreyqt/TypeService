@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Stats {
+public class UserStats {
     @JsonProperty("_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;

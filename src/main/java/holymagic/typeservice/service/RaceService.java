@@ -173,7 +173,7 @@ public class RaceService {
 
     private URI createCacheUpdateUri() {
         return UriBuilder.fromPath("/results")
-                .queryParam("limit", raceCache.getSize())
+                .queryParam("limit", raceCache.getCapacity())
                 .build();
     }
 

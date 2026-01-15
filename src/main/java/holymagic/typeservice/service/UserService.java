@@ -10,7 +10,7 @@ import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
-import holymagic.typeservice.model.user.Stats;
+import holymagic.typeservice.model.user.UserStats;
 import holymagic.typeservice.model.user.Streak;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CURRENT_TEST_ACTIVITY_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RECORDS;
-import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_LIST_OF_RECORDS;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_RECORDS_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.PROFILE_REF;
-import static holymagic.typeservice.model.ParameterizedTypeReferences.STATS_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.USER_STATS_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.STREAK_REF;
 
 @Service
@@ -48,7 +48,7 @@ public class UserService {
         URI uri = UriBuilder.fromPath("/users/personalBests")
                 .queryParam("mode", mode)
                 .build();
-        Map<String, List<PersonalBest>> response = exchangeService.makeGetRequest(uri, MAP_OF_LIST_OF_RECORDS);
+        Map<String, List<PersonalBest>> response = exchangeService.makeGetRequest(uri, MAP_OF_RECORDS_REF);
         return response.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
@@ -66,10 +66,10 @@ public class UserService {
         return personalBestMapper.toDto(response);
     }
 
-    public Stats getStats() {
+    public UserStats getUserStats() {
         URI uri = UriBuilder.fromPath("/users/stats")
                 .build();
-        return exchangeService.makeGetRequest(uri, STATS_REF);
+        return exchangeService.makeGetRequest(uri, USER_STATS_REF);
     }
 
     public Profile getProfile(String name) {

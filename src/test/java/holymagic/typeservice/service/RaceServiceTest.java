@@ -56,8 +56,8 @@ public class RaceServiceTest {
     @BeforeEach
     void setUp() {
         int defaultLimit = 10;
-        races = ServiceTestData.provideRaces();
-        raceDtos = ServiceTestData.provideRaceDtos();
+        races = RaceServiceTestData.provideRaces();
+        raceDtos = RaceServiceTestData.provideRaceDtos();
         uriCaptor = ArgumentCaptor.forClass(URI.class);
         ReflectionTestUtils.setField(raceService, "defaultLimit", defaultLimit);
     }

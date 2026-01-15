@@ -39,11 +39,14 @@ public class LeaderboardService {
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
                                               @Nullable Boolean friendsOnly) {
-        List<RankedRace> racesFromCache = getRacesFromCache(language, mode, mode2, pageSize);
+
+        List<RankedRace> racesFromCache = getRacesFromCache(language, mode, mode2, page, pageSize, friendsOnly);
+
         if (racesFromCache != null) {
             log.info("retrieved leaderboard from cache");
             return rankedRaceMapper.toDto(racesFromCache);
         }
+
         URI uri = prepareGetLeaderboardUri("/leaderboards", language, mode, mode2, page, pageSize, friendsOnly);
         Leaderboard leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF);
         return rankedRaceMapper.toDto(leaderboard.getEntries());
@@ -73,13 +76,16 @@ public class LeaderboardService {
     }
 
     public List<RankedRace> getRacesFromCache(String language, String mode, String mode2,
-                                              @Nullable Integer pageSize) {
-        if (pageSize == null || pageSize <= 0 || pageSize > leaderboardCache.getCapacity()) {
-            return null;
-        }
-        if (language.equals("english") && mode.equals("time") && mode2.equals("60")) {
-            return leaderboardCache.getAll()
-                    .stream()
+                                              @Nullable Integer page, @Nullable Integer pageSize,
+                                              @Nullable Boolean friendsOnly) {
+        if (language.equals("english") && mode.equals("time") && mode2.equals("60")
+                && (pageSize == null || pageSize > 0 || pageSize <= leaderboardCache.getCapacity())
+                && page == null && friendsOnly == null) {
+            List<RankedRace> races = leaderboardCache.getAll();
+            if (pageSize == null) {
+                return races;
+            }
+            return races.stream()
                     .limit(pageSize)
                     .toList();
         }

@@ -17,10 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RaceCache {
 
     @Value("${race_cache_size}")
+    @Getter
     private int capacity;
 
     @Value("${race_cache_bound}")
-    @Getter
     private int upperBound;
 
     private final ConcurrentSkipListMap<Long, Race> cache =
