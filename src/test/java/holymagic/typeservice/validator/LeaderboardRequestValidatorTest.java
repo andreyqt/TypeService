@@ -26,7 +26,8 @@ public class LeaderboardRequestValidatorTest {
     public void setUp() {
         validator = new LeaderboardRequestValidator();
         ReflectionTestUtils.setField(validator, "maxPageNumber", 1000);
-        ReflectionTestUtils.setField(validator, "maxPageSize", 200);
+        ReflectionTestUtils.setField(validator, "maxPageSize", 50);
+        ReflectionTestUtils.setField(validator, "minPageSize", 10);
     }
 
     @ParameterizedTest
@@ -57,7 +58,7 @@ public class LeaderboardRequestValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {10, 11, 100, 200})
+    @ValueSource(ints = {10, 11, 49, 50})
     @DisplayName("validates page size successfully")
     public void validatePageSize(int pageSize) {
         assertDoesNotThrow(() -> validator.validatePageSize(pageSize));

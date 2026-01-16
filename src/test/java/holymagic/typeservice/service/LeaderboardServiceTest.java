@@ -58,6 +58,7 @@ public class LeaderboardServiceTest {
         rankedRaces = LeaderboardServiceTestData.provideRankedRaces();
         rankedRaceDtos = LeaderboardServiceTestData.provideRankedRaceDtos();
         leaderboard = new Leaderboard(rankedRaces.size(), rankedRaces);
+        when(leaderboardCache.getCapacity()).thenReturn();
     }
 
     @Test

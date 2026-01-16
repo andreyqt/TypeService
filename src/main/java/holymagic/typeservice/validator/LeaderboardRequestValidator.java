@@ -76,7 +76,7 @@ public class LeaderboardRequestValidator {
         if (pageSize == null) {
             return;
         }
-        if (pageSize < 10 || pageSize > maxPageSize)
+        if (pageSize < minPageSize || pageSize > maxPageSize)
             throw new DataValidationException("Invalid page size: " + pageSize);
     }
 
