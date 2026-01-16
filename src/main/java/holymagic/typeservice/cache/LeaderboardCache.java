@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -30,6 +31,17 @@ public class LeaderboardCache {
 
     public List<RankedRace> getAll() {
         return new ArrayList<>(cache.descendingMap().values());
+    }
+
+    public List<RankedRace> getSome(Integer quantity) {
+        if (quantity == null) {
+            return getAll();
+        }
+        List<RankedRace> races = new ArrayList<>();
+        for (int i = 1; i <= quantity; i++) {
+            races.add(cache.get(i));
+        }
+        return races;
     }
 
     public void update(List<RankedRace> races) {

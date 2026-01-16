@@ -1,7 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.publicData.TypingStats;
-import holymagic.typeservice.validator.HttpParamValidator;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,10 +17,10 @@ import static holymagic.typeservice.model.ParameterizedTypeReferences.TYPING_STA
 public class PublicDataService {
 
     private final ExchangeService exchangeService;
-    private final HttpParamValidator httpParamValidator;
+    private final RaceRequestValidator raceRequestValidator;
 
     public Map<String, Integer> getSpeedHistogram(String language, String mode, String mode2) {
-        httpParamValidator.validatePublicDataArgs(language, mode, mode2);
+        // todo valid
         URI uri = UriBuilder.fromPath("/public/speedHistogram")
                 .queryParam("language", language)
                 .queryParam("mode", mode)

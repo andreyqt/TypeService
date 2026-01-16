@@ -9,7 +9,6 @@ import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
 import holymagic.typeservice.model.leaderboard.XpLeaderboard;
-import holymagic.typeservice.validator.HttpParamValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,8 +38,6 @@ public class LeaderboardServiceTest {
     @InjectMocks
     private LeaderboardService leaderboardService;
 
-    @Mock
-    private HttpParamValidator httpParamValidator;
     @Spy
     private RankedRaceMapperImpl rankedRaceMapper;
     @Spy

@@ -6,7 +6,7 @@ import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.mapper.RaceMapperImpl;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
-import holymagic.typeservice.validator.HttpParamValidator;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +38,7 @@ public class RaceServiceTest {
     @Mock
     private RaceRepository raceRepository;
     @Mock
-    private HttpParamValidator httpParamValidator;
+    private RaceRequestValidator raceRequestValidator;
     @Mock
     private ExchangeService exchangeService;
     @Mock
@@ -110,9 +110,9 @@ public class RaceServiceTest {
     }
 
     public void verifyValidation() {
-        verify(httpParamValidator, times(1)).validateTimestamp(anyLong());
-        verify(httpParamValidator, times(1)).validateLimit(anyInt());
-        verify(httpParamValidator, times(1)).validateOffset(anyInt());
+        verify(raceRequestValidator, times(1)).validateTimestamp(anyLong());
+        verify(raceRequestValidator, times(1)).validateLimit(anyInt());
+        verify(raceRequestValidator, times(1)).validateOffset(anyInt());
     }
 
 }

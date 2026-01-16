@@ -41,7 +41,10 @@ public class RaceCache {
         return null;
     }
 
-    public List<Race> get(int quantity) {
+    public List<Race> get(Integer quantity) {
+        if (quantity == null) {
+            return getAll();
+        }
         return cache.descendingMap()
                 .values()
                 .stream()

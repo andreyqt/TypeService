@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import static holymagic.typeservice.service.RaceServiceTestData.NEW_RACE;
 import static holymagic.typeservice.service.RaceServiceTestData.OUTDATED_RACE;
@@ -93,13 +92,6 @@ public class RaceCacheTest {
     }
 
     @Test
-    public void clearTest() {
-        assertEquals(5, raceCache.getSize());
-        clearCache();
-        assertEquals(0, raceCache.getSize());
-    }
-
-    @Test
     public void getAllTest() {
         List<Race> actualRaces = raceCache.getAll();
         List<Race> expectedRaces = races;
@@ -127,11 +119,6 @@ public class RaceCacheTest {
         assertEquals(3, raceCache.getSize());
         assertNull(raceCache.get(1767014109000L));
         assertNull(raceCache.get(1767014110000L));
-    }
-
-    public void clearCache() {
-        Map<?,?> cache = (Map<?,?>) ReflectionTestUtils.getField(raceCache, "cache");
-        cache.clear();
     }
 
 }

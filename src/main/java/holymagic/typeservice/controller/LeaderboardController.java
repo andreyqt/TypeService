@@ -3,6 +3,8 @@ package holymagic.typeservice.controller;
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.service.LeaderboardService;
+import holymagic.typeservice.validator.RaceRequestValidator;
+import holymagic.typeservice.validator.LeaderboardRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/leaderboards")
 public class LeaderboardController {
+
     private final LeaderboardService leaderboardService;
+    private final RaceRequestValidator raceRequestValidator;
+    private final LeaderboardRequestValidator validator;
 
     @Operation(summary = "Gets all-time leaderboard")
     @GetMapping("/")
@@ -27,6 +32,7 @@ public class LeaderboardController {
                                                               @RequestParam(required = false) Integer page,
                                                               @RequestParam(required = false) Integer pageSize,
                                                               @RequestParam(required = false) Boolean friendsOnly) {
+        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, page, pageSize);
         return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, page, pageSize, friendsOnly));
     }
 
@@ -36,6 +42,7 @@ public class LeaderboardController {
                                                  @RequestParam String mode,
                                                  @RequestParam String mode2,
                                                  @RequestParam(required = false) Boolean friendsOnly) {
+        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, null, null);
         return ResponseEntity.ok(leaderboardService.getRank(language, mode, mode2, friendsOnly));
     }
 
@@ -47,6 +54,7 @@ public class LeaderboardController {
                                                                    @RequestParam(required = false) Integer page,
                                                                    @RequestParam(required = false) Integer pageSize,
                                                                    @RequestParam(required = false) Boolean friendsOnly) {
+        validator.validateDailyLeaderboardArgs(language, mode, mode2, page, pageSize);
         return ResponseEntity.ok(leaderboardService.getDailyLeaderboard(language, mode, mode2,
                 page, pageSize, friendsOnly));
     }
@@ -56,6 +64,8 @@ public class LeaderboardController {
     public ResponseEntity<List<WeeklyActivityDto>> getWeeklyXpLeaderboard(@RequestParam(required = false) Integer page,
                                                                           @RequestParam(required = false) Integer pageSize,
                                                                           @RequestParam(required = false) Boolean friendsOnly) {
+        validator.validatePage(page);
+        validator.validatePageSize(pageSize);
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
     }
 

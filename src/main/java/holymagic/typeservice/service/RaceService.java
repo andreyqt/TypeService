@@ -5,7 +5,7 @@ import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
-import holymagic.typeservice.validator.HttpParamValidator;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,7 +34,7 @@ public class RaceService {
     private final RaceCache raceCache;
     private final RaceRepository raceRepository;
     private final ExchangeService exchangeService;
-    private final HttpParamValidator httpParamValidator;
+    private final RaceRequestValidator raceRequestValidator;
 
     @Value("${default_limit}")
     private int defaultLimit;
@@ -155,17 +155,17 @@ public class RaceService {
     private URI createGetResulstUri(Long timestamp, Integer offset, Integer limit) {
         UriBuilder builder = UriBuilder.fromPath("/results");
         if (timestamp != null) {
-            httpParamValidator.validateTimestamp(timestamp);
+            raceRequestValidator.validateTimestamp(timestamp);
             builder.queryParam("onOrAfterTimestamp", timestamp);
         }
         if (offset != null) {
-            httpParamValidator.validateOffset(offset);
+            raceRequestValidator.validateOffset(offset);
             builder.queryParam("offset", offset);
         }
         if (limit == null) {
             builder.queryParam("limit", defaultLimit);
         } else {
-            httpParamValidator.validateLimit(limit);
+            raceRequestValidator.validateLimit(limit);
             builder.queryParam("limit", limit);
         }
         return builder.build();
