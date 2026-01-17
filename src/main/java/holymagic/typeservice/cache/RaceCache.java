@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -76,6 +77,16 @@ public class RaceCache {
         } else {
             log.info("race cache is already updating");
         }
+    }
+
+    public List<Race> getAfter(Long onOrAfterTimestamp) {
+        List<Race> races = new ArrayList<>();
+        for (Map.Entry<Long, Race> entry : cache.entrySet()) {
+            if (entry.getKey() >= onOrAfterTimestamp) {
+                races.add(entry.getValue());
+            }
+        }
+        return races;
     }
 
     public void initialize(List<Race> races) {

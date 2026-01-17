@@ -40,8 +40,12 @@ public class LeaderboardService {
 
         if (canGetFromCache(mode2, page, pageSize, friendsOnly)) {
             List<RankedRace> racesFromCache = leaderboardCache.getSome(pageSize);
-            log.info("retrieved leaderboard from cache");
-            return rankedRaceMapper.toDto(racesFromCache);
+            if (racesFromCache == null || racesFromCache.isEmpty()) {
+                log.warn("couldn't receive races from cache");
+            } else {
+                log.info("retrieved leaderboard from cache");
+                return rankedRaceMapper.toDto(racesFromCache);
+            }
         }
 
         URI uri = prepareGetLeaderboardUri("/leaderboards", language, mode, mode2, page, pageSize, friendsOnly);
@@ -74,18 +78,25 @@ public class LeaderboardService {
     }
 
     @PostConstruct
-    public void updateLeaderboardCache() {
+    public void initializeLeaderboardCache() {
         URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
                 "60", 0, leaderboardCache.getCapacity(), null);
-        List<RankedRace> leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF)
-                .getEntries();
-        leaderboardCache.update(leaderboard);
+        try {
+            List<RankedRace> leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF)
+                    .getEntries();
+            leaderboardCache.initialize(leaderboard);
+        } catch (Exception e) {
+            log.warn("couldn't initialize leaderboard cache");
+        }
     }
 
     @Async("cacheUpdateExecutor")
     @Scheduled(cron = "${leaderboard_update_cron}")
     public void updateLeaderboardCacheAsync() {
-        updateLeaderboardCache();
+        URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
+                "60", 0, leaderboardCache.getCapacity(), null);
+        List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
+        leaderboardCache.update(races);
     }
 
     private URI prepareGetLeaderboardUri(String path, String language, String mode, String mode2,
@@ -103,7 +114,9 @@ public class LeaderboardService {
         if (page != null) {
             builder.queryParam("page", page);
         }
-        builder.queryParam("pageSize", pageSize != null ? pageSize : leaderboardCache.getCapacity());
+        if (pageSize != null) {
+            builder.queryParam("pageSize", pageSize);
+        }
         if (friendsOnly != null) {
             builder.queryParam("friendsOnly", friendsOnly);
         }
@@ -112,7 +125,7 @@ public class LeaderboardService {
 
     private boolean canGetFromCache(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
         if (mode2.equals("60") && (friendsOnly == null || !friendsOnly) && page == null
-        && (pageSize == null || pageSize <= leaderboardCache.getCapacity())) {
+                && (pageSize == null || pageSize <= leaderboardCache.getCapacity())) {
             return true;
         }
         return false;

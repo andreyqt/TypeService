@@ -39,6 +39,18 @@ public class RaceService {
     @Value("${default_limit}")
     private int defaultLimit;
 
+    public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
+                                    @Nullable Integer offset,
+                                    @Nullable Integer limit) {
+        if(canGetFromCache(onOrAfterTimestamp, offset, limit)) {
+            List<Race> races = raceCache.getAfter(onOrAfterTimestamp);
+            if (races != null || !races.isEmpty()) {
+                return raceMapper.toDto(races);
+            }
+        }
+        return getResultsFromRequest(onOrAfterTimestamp, offset, limit);
+    }
+
     public List<RaceDto> getResultsFromRequest(@Nullable Long onOrAfterTimestamp,
                                                @Nullable Integer offset,
                                                @Nullable Integer limit) {
@@ -135,8 +147,12 @@ public class RaceService {
 
     @PostConstruct
     public void initializeCache() {
-        List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
-        raceCache.initialize(races);
+        try {
+            List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
+            raceCache.initialize(races);
+        } catch (Exception e) {
+            log.error("failed to initialize race cache: {}", e.getMessage());
+        }
     }
 
     @Async("cacheUpdateExecutor")
@@ -175,6 +191,22 @@ public class RaceService {
         return UriBuilder.fromPath("/results")
                 .queryParam("limit", raceCache.getCapacity())
                 .build();
+    }
+
+    private boolean canGetFromCache(Long onOrAfterTimestamp, Integer offset, Integer limit) {
+        if (onOrAfterTimestamp == null && offset == null && limit == null) {
+            return true;
+        }
+        if (offset != null) {
+            return false;
+        }
+        if (raceCache.getLastestRace().getTimestamp() < onOrAfterTimestamp) {
+            return false;
+        }
+        if (limit != null || limit > raceCache.getSize()) {
+            return false;
+        }
+        return true;
     }
 
 }

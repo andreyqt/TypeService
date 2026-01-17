@@ -60,6 +60,12 @@ public class LeaderboardCache {
         }
     }
 
+    public void initialize(List<RankedRace> races) {
+        for (RankedRace race : races) {
+            cache.put(race.getRank(), race);
+        }
+    }
+
     private void add(RankedRace race) {
         if (race.getRank() > capacity) {return;}
         cache.put(race.getRank(), race);
