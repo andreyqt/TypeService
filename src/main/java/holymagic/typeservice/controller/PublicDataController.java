@@ -16,6 +16,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/public")
 @RequiredArgsConstructor
 public class PublicDataController {
+
     private final PublicDataService publicDataService;
 
     @Operation(summary = "gets number of users personal bests grouped by wpm level (multiples of ten)")

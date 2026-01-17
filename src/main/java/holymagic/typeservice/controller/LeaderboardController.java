@@ -3,7 +3,6 @@ package holymagic.typeservice.controller;
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.service.LeaderboardService;
-import holymagic.typeservice.validator.RaceRequestValidator;
 import holymagic.typeservice.validator.LeaderboardRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
