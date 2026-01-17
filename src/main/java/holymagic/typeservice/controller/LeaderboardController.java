@@ -21,7 +21,6 @@ import java.util.List;
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
-    private final RaceRequestValidator raceRequestValidator;
     private final LeaderboardRequestValidator validator;
 
     @Operation(summary = "Gets all-time leaderboard")
