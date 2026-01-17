@@ -200,7 +200,7 @@ public class RaceService {
         if (offset != null) {
             return false;
         }
-        if (raceCache.getLastestRace().getTimestamp() < onOrAfterTimestamp) {
+        if (onOrAfterTimestamp != null && raceCache.getLastestRace().getTimestamp() < onOrAfterTimestamp) {
             return false;
         }
         if (limit != null && limit > raceCache.getSize()) {
