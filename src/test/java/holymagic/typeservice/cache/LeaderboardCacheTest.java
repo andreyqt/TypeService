@@ -2,6 +2,7 @@ package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,6 +59,22 @@ public class LeaderboardCacheTest {
                 assertEquals(generatedRaces.get(i), leaderboardCache.get(i+1));
             }
         });
+    }
+
+    @Test
+    @DisplayName("shows that getSome(arg) works as getAll() for null arg")
+    public void getSomeForNullArgTest() {
+        List<RankedRace> actualRaces = leaderboardCache.getAll();
+        List<RankedRace> expectedRaces = leaderboardCache.getSome(null);
+        assertEquals(expectedRaces, actualRaces);
+    }
+
+    @Test
+    @DisplayName("shows that getSome(arg) retrieves first n races from cache")
+    public void getSomeTest() {
+        List<RankedRace> expectedSubList = generatedRaces.subList(0, 3);
+        List<RankedRace> actualSubList = leaderboardCache.getSome(3);
+        assertEquals(expectedSubList, actualSubList);
     }
 
     public List<RankedRace> provideRankedRaces(int quantity) {

@@ -5,7 +5,7 @@ import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.mapper.RaceMapper;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.repository.RaceRepository;
-import holymagic.typeservice.validator.HttpParamValidator;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,10 +34,24 @@ public class RaceService {
     private final RaceCache raceCache;
     private final RaceRepository raceRepository;
     private final ExchangeService exchangeService;
-    private final HttpParamValidator httpParamValidator;
+    private final RaceRequestValidator raceRequestValidator;
 
     @Value("${default_limit}")
     private int defaultLimit;
+
+    public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
+                                    @Nullable Integer offset,
+                                    @Nullable Integer limit) {
+        if(canGetFromCache(onOrAfterTimestamp, offset, limit)) {
+            List<Race> races = raceCache.getAfter(onOrAfterTimestamp);
+            if (races != null || !races.isEmpty()) {
+                log.info("retrieved results from race cache");
+                return raceMapper.toDto(races);
+            }
+        }
+        log.info("can't get from cache, sending request...");
+        return getResultsFromRequest(onOrAfterTimestamp, offset, limit);
+    }
 
     public List<RaceDto> getResultsFromRequest(@Nullable Long onOrAfterTimestamp,
                                                @Nullable Integer offset,
@@ -135,8 +149,12 @@ public class RaceService {
 
     @PostConstruct
     public void initializeCache() {
-        List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
-        raceCache.initialize(races);
+        try {
+            List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
+            raceCache.initialize(races);
+        } catch (Exception e) {
+            log.error("failed to initialize race cache: {}", e.getMessage());
+        }
     }
 
     @Async("cacheUpdateExecutor")
@@ -155,17 +173,17 @@ public class RaceService {
     private URI createGetResulstUri(Long timestamp, Integer offset, Integer limit) {
         UriBuilder builder = UriBuilder.fromPath("/results");
         if (timestamp != null) {
-            httpParamValidator.validateTimestamp(timestamp);
+            raceRequestValidator.validateTimestamp(timestamp);
             builder.queryParam("onOrAfterTimestamp", timestamp);
         }
         if (offset != null) {
-            httpParamValidator.validateOffset(offset);
+            raceRequestValidator.validateOffset(offset);
             builder.queryParam("offset", offset);
         }
         if (limit == null) {
             builder.queryParam("limit", defaultLimit);
         } else {
-            httpParamValidator.validateLimit(limit);
+            raceRequestValidator.validateLimit(limit);
             builder.queryParam("limit", limit);
         }
         return builder.build();
@@ -175,6 +193,22 @@ public class RaceService {
         return UriBuilder.fromPath("/results")
                 .queryParam("limit", raceCache.getCapacity())
                 .build();
+    }
+
+    private boolean canGetFromCache(Long onOrAfterTimestamp, Integer offset, Integer limit) {
+        if (onOrAfterTimestamp == null && offset == null && limit == null) {
+            return true;
+        }
+        if (offset != null) {
+            return false;
+        }
+        if (onOrAfterTimestamp != null && raceCache.getLastestRace().getTimestamp() < onOrAfterTimestamp) {
+            return false;
+        }
+        if (limit != null && limit > raceCache.getSize()) {
+            return false;
+        }
+        return true;
     }
 
 }

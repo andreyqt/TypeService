@@ -8,7 +8,6 @@ import holymagic.typeservice.mapper.WeeklyActivityMapper;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
-import holymagic.typeservice.validator.HttpParamValidator;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.UriBuilder;
@@ -34,17 +33,19 @@ public class LeaderboardService {
     private final WeeklyActivityMapper weeklyActivityMapper;
     private final LeaderboardCache leaderboardCache;
     private final ExchangeService exchangeService;
-    private final HttpParamValidator httpParamValidator;
 
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
                                               @Nullable Boolean friendsOnly) {
 
-        List<RankedRace> racesFromCache = getRacesFromCache(language, mode, mode2, page, pageSize, friendsOnly);
-
-        if (racesFromCache != null) {
-            log.info("retrieved leaderboard from cache");
-            return rankedRaceMapper.toDto(racesFromCache);
+        if (canGetFromCache(mode2, page, pageSize, friendsOnly)) {
+            List<RankedRace> racesFromCache = leaderboardCache.getSome(pageSize);
+            if (racesFromCache == null || racesFromCache.isEmpty()) {
+                log.warn("couldn't receive races from cache");
+            } else {
+                log.info("retrieved leaderboard from cache");
+                return rankedRaceMapper.toDto(racesFromCache);
+            }
         }
 
         URI uri = prepareGetLeaderboardUri("/leaderboards", language, mode, mode2, page, pageSize, friendsOnly);
@@ -53,7 +54,8 @@ public class LeaderboardService {
     }
 
     public RankedRaceDto getRank(String language, String mode, String mode2, @Nullable Boolean friendsOnly) {
-        URI uri = prepareGetLeaderboardUri("/leaderboards/rank", language, mode, mode2, null, null, friendsOnly);
+        URI uri = prepareGetLeaderboardUri("/leaderboards/rank", language, mode, mode2,
+                null, null, friendsOnly);
         RankedRace rankedRace = exchangeService.makeGetRequest(uri, RANKED_RACE_REF);
         return rankedRaceMapper.toDto(rankedRace);
     }
@@ -75,43 +77,32 @@ public class LeaderboardService {
         return weeklyActivityMapper.toDto(activity);
     }
 
-    public List<RankedRace> getRacesFromCache(String language, String mode, String mode2,
-                                              @Nullable Integer page, @Nullable Integer pageSize,
-                                              @Nullable Boolean friendsOnly) {
-        if (language.equals("english") && mode.equals("time") && mode2.equals("60")
-                && (pageSize == null || pageSize > 0 || pageSize <= leaderboardCache.getCapacity())
-                && page == null && friendsOnly == null) {
-            List<RankedRace> races = leaderboardCache.getAll();
-            if (pageSize == null) {
-                return races;
-            }
-            return races.stream()
-                    .limit(pageSize)
-                    .toList();
-        }
-        return null;
-    }
-
     @PostConstruct
-    public void updateLeaderboardCache() {
+    public void initializeLeaderboardCache() {
         URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
                 "60", 0, leaderboardCache.getCapacity(), null);
-        List<RankedRace> leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF)
-                .getEntries();
-        leaderboardCache.update(leaderboard);
+        try {
+            List<RankedRace> leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF)
+                    .getEntries();
+            leaderboardCache.initialize(leaderboard);
+        } catch (Exception e) {
+            log.warn("couldn't initialize leaderboard cache");
+        }
     }
 
     @Async("cacheUpdateExecutor")
     @Scheduled(cron = "${leaderboard_update_cron}")
     public void updateLeaderboardCacheAsync() {
-        updateLeaderboardCache();
+        URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
+                "60", 0, leaderboardCache.getCapacity(), null);
+        List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
+        leaderboardCache.update(races);
     }
 
     private URI prepareGetLeaderboardUri(String path, String language, String mode, String mode2,
                                          @Nullable Integer page, @Nullable Integer pageSize,
                                          @Nullable Boolean friendsOnly) {
         UriBuilder builder = UriBuilder.fromPath(path);
-        httpParamValidator.validatePublicDataArgs(language, mode, mode2);
         builder.queryParam("language", language);
         builder.queryParam("mode", mode);
         builder.queryParam("mode2", mode2);
@@ -121,17 +112,20 @@ public class LeaderboardService {
     private URI addOptionalParams(UriBuilder builder, @Nullable Boolean friendsOnly,
                                   @Nullable Integer page, @Nullable Integer pageSize) {
         if (page != null) {
-            httpParamValidator.validatePageNumber(page);
             builder.queryParam("page", page);
         }
         if (pageSize != null) {
-            httpParamValidator.validatePageSize(pageSize);
             builder.queryParam("pageSize", pageSize);
         }
         if (friendsOnly != null) {
-            builder.queryParam("friendsOnly", true);
+            builder.queryParam("friendsOnly", friendsOnly);
         }
         return builder.build();
+    }
+
+    private boolean canGetFromCache(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
+        return mode2.equals("60") && (friendsOnly == null || !friendsOnly) && page == null
+                && (pageSize == null || pageSize <= leaderboardCache.getCapacity());
     }
 
 }

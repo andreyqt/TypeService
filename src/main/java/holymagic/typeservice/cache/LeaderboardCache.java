@@ -32,6 +32,17 @@ public class LeaderboardCache {
         return new ArrayList<>(cache.descendingMap().values());
     }
 
+    public List<RankedRace> getSome(Integer quantity) {
+        if (quantity == null) {
+            return getAll();
+        }
+        List<RankedRace> races = new ArrayList<>();
+        for (int i = 1; i <= quantity; i++) {
+            races.add(cache.get(i));
+        }
+        return races;
+    }
+
     public void update(List<RankedRace> races) {
         if (updating.compareAndSet(false, true)) {
             try {
@@ -40,12 +51,18 @@ public class LeaderboardCache {
                 }
                 log.info("leaderboard's cached has been updated successfully");
             } catch (Exception e) {
-                log.error("failed to update leaderboard's cache", e.getMessage());
+                log.error("failed to update leaderboard's cache: {}", e.getMessage());
             } finally {
                 updating.set(false);
             }
         } else {
             log.info("leaderboard's cache is already updating");
+        }
+    }
+
+    public void initialize(List<RankedRace> races) {
+        for (RankedRace race : races) {
+            cache.put(race.getRank(), race);
         }
     }
 

@@ -1,7 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.publicData.TypingStats;
-import holymagic.typeservice.validator.HttpParamValidator;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,7 +31,7 @@ public class PublicDataServiceTest {
     @Mock
     private ExchangeService exchangeService;
     @Mock
-    private HttpParamValidator httpParamValidator;
+    private RaceRequestValidator raceRequestValidator;
 
     ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
 
