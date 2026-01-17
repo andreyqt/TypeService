@@ -203,7 +203,7 @@ public class RaceService {
         if (raceCache.getLastestRace().getTimestamp() < onOrAfterTimestamp) {
             return false;
         }
-        if (limit != null || limit > raceCache.getSize()) {
+        if (limit != null && limit > raceCache.getSize()) {
             return false;
         }
         return true;
