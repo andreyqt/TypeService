@@ -39,7 +39,7 @@ public class LeaderboardRequestValidator {
     public void ValidateGlobalLeaderboardArgs(String language, String mode, String mode2,
                                               Integer page, Integer pageSize) {
         if (!GLOBAL_ALLOWED_LANGUAGES.contains(language)) {
-            throw new DataValidationException("invalid language for global lbs: " + language);
+            throw new DataValidationException("invalid language");
         }
         validateModes(mode, mode2);
         validatePage(page);

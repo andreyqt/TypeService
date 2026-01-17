@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Something went wrong :(");
     }
 
     @ExceptionHandler(DataValidationException.class)
