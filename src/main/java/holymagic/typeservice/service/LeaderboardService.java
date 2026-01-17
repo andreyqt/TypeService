@@ -124,11 +124,8 @@ public class LeaderboardService {
     }
 
     private boolean canGetFromCache(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
-        if (mode2.equals("60") && (friendsOnly == null || !friendsOnly) && page == null
-                && (pageSize == null || pageSize <= leaderboardCache.getCapacity())) {
-            return true;
-        }
-        return false;
+        return mode2.equals("60") && (friendsOnly == null || !friendsOnly) && page == null
+                && (pageSize == null || pageSize <= leaderboardCache.getCapacity());
     }
 
 }

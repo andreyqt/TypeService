@@ -51,7 +51,7 @@ public class LeaderboardCache {
                 }
                 log.info("leaderboard's cached has been updated successfully");
             } catch (Exception e) {
-                log.error("failed to update leaderboard's cache", e.getMessage());
+                log.error("failed to update leaderboard's cache: {}", e.getMessage());
             } finally {
                 updating.set(false);
             }
