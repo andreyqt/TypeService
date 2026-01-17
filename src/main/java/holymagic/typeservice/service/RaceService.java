@@ -45,9 +45,11 @@ public class RaceService {
         if(canGetFromCache(onOrAfterTimestamp, offset, limit)) {
             List<Race> races = raceCache.getAfter(onOrAfterTimestamp);
             if (races != null || !races.isEmpty()) {
+                log.info("retrieved results from race cache");
                 return raceMapper.toDto(races);
             }
         }
+        log.info("can't get from cache, sending request...");
         return getResultsFromRequest(onOrAfterTimestamp, offset, limit);
     }
 

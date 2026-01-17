@@ -80,6 +80,9 @@ public class RaceCache {
     }
 
     public List<Race> getAfter(Long onOrAfterTimestamp) {
+        if (onOrAfterTimestamp == null) {
+            return getAll();
+        }
         List<Race> races = new ArrayList<>();
         for (Map.Entry<Long, Race> entry : cache.entrySet()) {
             if (entry.getKey() >= onOrAfterTimestamp) {

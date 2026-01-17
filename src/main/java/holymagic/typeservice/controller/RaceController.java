@@ -27,7 +27,7 @@ public class RaceController {
     public ResponseEntity<List<RaceDto>> getResults(@RequestParam(required = false) Long onOrAfterTimestamp,
                                                     @RequestParam(required = false) Integer offset,
                                                     @RequestParam(required = false) Integer limit) {
-        return ResponseEntity.ok(raceService.getResultsFromRequest(onOrAfterTimestamp, offset, limit));
+        return ResponseEntity.ok(raceService.getResults(onOrAfterTimestamp, offset, limit));
     }
 
     @Operation(summary = "Gets result by id")
