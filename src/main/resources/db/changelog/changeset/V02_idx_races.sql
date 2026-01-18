@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_races_timestamp ON races(timestamp);

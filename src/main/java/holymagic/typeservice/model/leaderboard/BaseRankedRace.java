@@ -2,9 +2,8 @@ package holymagic.typeservice.model.leaderboard;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "leaderboards_60s")
-public class RankedRace {
+@MappedSuperclass
+public class BaseRankedRace {
     @Id
     @Column(name = "uid")
     private String uid;

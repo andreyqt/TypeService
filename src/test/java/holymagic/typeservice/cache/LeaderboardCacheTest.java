@@ -1,12 +1,16 @@
 package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.repository.LeaderboardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class LeaderboardCacheTest {
 
+    @InjectMocks
     private LeaderboardCache leaderboardCache;
+    @Mock
+    private LeaderboardRepository leaderboardRepository;
+    @Mock
+    private PlatformTransactionManager txManager;
+
     private int testCapacity;
     private List<RankedRace> generatedRaces;
 
     @BeforeEach
     void setUp() {
         testCapacity = 50;
-        leaderboardCache = new LeaderboardCache();
         ReflectionTestUtils.setField(leaderboardCache, "capacity", testCapacity);
         generatedRaces = provideRankedRaces(testCapacity);
         leaderboardCache.update(generatedRaces);

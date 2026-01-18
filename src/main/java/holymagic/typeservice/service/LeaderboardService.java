@@ -8,14 +8,17 @@ import holymagic.typeservice.mapper.WeeklyActivityMapper;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
+import holymagic.typeservice.repository.LeaderboardRepository;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.List;
@@ -33,6 +36,10 @@ public class LeaderboardService {
     private final WeeklyActivityMapper weeklyActivityMapper;
     private final LeaderboardCache leaderboardCache;
     private final ExchangeService exchangeService;
+    private final LeaderboardRepository leaderboardRepository;
+
+    @Value("${leaderbaord_batch_size}")
+    private int batchSize;
 
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
@@ -77,17 +84,13 @@ public class LeaderboardService {
         return weeklyActivityMapper.toDto(activity);
     }
 
-    @PostConstruct
-    public void initializeLeaderboardCache() {
+    @Transactional
+    public void getAndSave() {
         URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                "60", 0, leaderboardCache.getCapacity(), null);
-        try {
-            List<RankedRace> leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF)
-                    .getEntries();
-            leaderboardCache.initialize(leaderboard);
-        } catch (Exception e) {
-            log.warn("couldn't initialize leaderboard cache");
-        }
+                "60", 0, batchSize, null);
+        List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
+        leaderboardCache.update(races);
+        leaderboardRepository.saveAll(races);
     }
 
     @Async("cacheUpdateExecutor")
