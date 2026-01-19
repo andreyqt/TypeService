@@ -24,6 +24,14 @@ public interface RankedRaceMapper {
     })
     RankedRaceDto toDto(RankedRace rankedRace);
 
+    @Mappings({
+            @Mapping(source = "acc", target = "accuracy"),
+            @Mapping(source = "wpm", target = "speed"),
+            @Mapping(source = "timestamp", target = "localDateTime", qualifiedByName = "mapLongToLocalDateTime")
+    })
+    RankedRaceDto toDto(RankedRace15 rankedRace15);
+
+
     RankedRace15 toRankedRace15(RankedRace rankedRace);
 
     void updateEntity(RankedRace source, @MappingTarget RankedRace rankedRace);

@@ -153,7 +153,8 @@ public class RaceService {
             List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
             raceCache.initialize(races);
         } catch (Exception e) {
-            log.error("failed to initialize race cache: {}", e.getMessage());
+            log.error("failed to initialize race cache from http-request: {}", e.getMessage());
+            raceCache.initializeFromDb();
         }
     }
 

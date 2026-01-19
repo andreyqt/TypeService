@@ -1,10 +1,17 @@
 package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.race.Race;
+import holymagic.typeservice.repository.RaceRepository;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RaceCache {
 
     @Value("${race_cache_size}")
@@ -27,7 +35,8 @@ public class RaceCache {
     private final ConcurrentSkipListMap<Long, Race> cache =
             new ConcurrentSkipListMap<>(Comparator.reverseOrder());
     private final AtomicBoolean updating = new AtomicBoolean(false);
-
+    private final PlatformTransactionManager txManager;
+    private final RaceRepository raceRepository;
 
     public Race get(Long timestamp) {
         return cache.get(timestamp);
@@ -55,7 +64,7 @@ public class RaceCache {
 
     public void add(Race race) {
         if (race.getTimestamp() > cache.lastKey()) {
-            if (cache.size() >= capacity) {
+            if (cache.size() > capacity) {
                 cache.remove(cache.lastKey());
             }
             cache.putIfAbsent(race.getTimestamp(), race);
@@ -67,8 +76,8 @@ public class RaceCache {
             try {
                 for (Race race : races) {
                     add(race);
-                    log.info("race cache has been updated, size is {}", cache.size());
                 }
+                log.info("race cache has been updated, size is {}", cache.size());
             } catch (Exception e) {
                 log.error("failed to update race cache", e);
             } finally {
@@ -95,6 +104,26 @@ public class RaceCache {
     public void initialize(List<Race> races) {
         for (Race race : races) {
             cache.put(race.getTimestamp(), race);
+        }
+    }
+
+    public void initializeFromDb() {
+        try {
+            TransactionTemplate txTemplate = new TransactionTemplate(txManager);
+            List<Race> racesFromDb = txTemplate.execute(new TransactionCallback<List<Race>>() {
+                @Override
+                public List<Race> doInTransaction(TransactionStatus status) {
+                    return raceRepository.findForCache(capacity);
+                }
+            });
+            if (!racesFromDb.isEmpty()) {
+                initialize(racesFromDb);
+                log.info("initialized race cache from db successfully");
+            } else {
+                log.warn("couldn't initialize race cache from db: db is empty");
+            }
+        } catch (Exception e) {
+            log.error("failed initialize race cache from db: {}", e.getMessage());
         }
     }
 

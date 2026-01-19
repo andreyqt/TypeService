@@ -71,23 +71,24 @@ public class LeaderboardCache {
 
     @PostConstruct
     public void initialize() {
-        TransactionTemplate template = new TransactionTemplate(txManager);
-        List<RankedRace> races = template.execute(new TransactionCallback<List<RankedRace>>() {
-            @Override
-            public List<RankedRace> doInTransaction(TransactionStatus status) {
-                if (leaderboardRepository.count() != 0) {
+        try {
+            TransactionTemplate template = new TransactionTemplate(txManager);
+            List<RankedRace> races = template.execute(new TransactionCallback<List<RankedRace>>() {
+                @Override
+                public List<RankedRace> doInTransaction(TransactionStatus status) {
                     return leaderboardRepository.findAll();
                 }
-                return null;
+            });
+            if (!races.isEmpty()) {
+                for (RankedRace race : races) {
+                    cache.put(race.getRank(), race);
+                }
+                log.info("initialized lbs cache from db successfully");
+            } else {
+                log.warn("couldn't initialize lbs cache from db: db is empty");
             }
-        });
-        if (races != null && !races.isEmpty()) {
-            for (RankedRace race : races) {
-                cache.put(race.getRank(), race);
-            }
-            log.info("initialized lbs cache from db successfully");
-        } else {
-            log.warn("couldn't initialize lbs cache from db");
+        } catch (Exception e) {
+            log.error("failed to initialize lbs cache from db: {}", e.getMessage());
         }
     }
 
