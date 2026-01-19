@@ -84,6 +84,14 @@ public class RaceService {
         throw new EntityNotFoundException(String.format("race with timestamp %s was not found in cache", timestamp));
     }
 
+    public RaceDto getRaceByIdFromCache(String id) {
+        Race race = raceCache.getById(id);
+        if (race != null) {
+            return raceMapper.toDto(race);
+        }
+        throw new EntityNotFoundException(String.format("race with id %s was not found in cache", id));
+    }
+
     @Transactional(readOnly = true)
     public RaceDto getRaceByIdFromDb(String raceId) {
         Optional<Race> race = raceRepository.findById(raceId);
@@ -152,6 +160,7 @@ public class RaceService {
         try {
             List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
             raceCache.initialize(races);
+            log.info("race cache has been initialized successfully by http-request");
         } catch (Exception e) {
             log.error("failed to initialize race cache from http-request: {}", e.getMessage());
             raceCache.initializeFromDb();

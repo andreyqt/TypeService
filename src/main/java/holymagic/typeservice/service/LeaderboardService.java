@@ -5,7 +5,6 @@ import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.mapper.RankedRaceMapper;
 import holymagic.typeservice.mapper.WeeklyActivityMapper;
-import holymagic.typeservice.model.leaderboard.BaseRankedRace;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.RankedRace15;

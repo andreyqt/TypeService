@@ -21,13 +21,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(NotFoundException e) {
-        return new ErrorResponse("entity not found");
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleEntityNotFoundException(EntityNotFoundException e) {
-        return new ErrorResponse("entity not found");
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(HttpClientErrorException.class)

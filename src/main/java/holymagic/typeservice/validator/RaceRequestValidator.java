@@ -34,4 +34,10 @@ public class RaceRequestValidator {
         }
     }
 
+    public void validateGetResultsArgs(Long onOrAfterTimestamp, int offset, int limit) {
+        validateTimestamp(onOrAfterTimestamp);
+        validateOffset(offset);
+        validateLimit(limit);
+    }
+
 }
