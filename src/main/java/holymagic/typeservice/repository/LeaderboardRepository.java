@@ -1,7 +1,6 @@
 package holymagic.typeservice.repository;
 
 import holymagic.typeservice.model.leaderboard.RankedRace;
-import holymagic.typeservice.model.leaderboard.RankedRace15;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

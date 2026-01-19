@@ -19,7 +19,7 @@ public class LeaderboardServiceTestData {
         for (int i = 0; i < 5; i++) {
             int rank = i + 1;
             double wpm = 350. - i * 1.0;
-            RankedRace rankedRace = (RankedRace) RankedRace.builder()
+            RankedRace rankedRace = RankedRace.builder()
                     .rank(rank)
                     .uid("test_id_" + rank)
                     .acc(100. - rank)

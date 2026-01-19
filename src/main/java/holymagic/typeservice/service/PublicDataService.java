@@ -1,7 +1,6 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.publicData.TypingStats;
-import holymagic.typeservice.validator.LeaderboardRequestValidator;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

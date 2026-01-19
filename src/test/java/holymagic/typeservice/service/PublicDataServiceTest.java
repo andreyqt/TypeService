@@ -1,7 +1,6 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.model.publicData.TypingStats;
-import holymagic.typeservice.validator.RaceRequestValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

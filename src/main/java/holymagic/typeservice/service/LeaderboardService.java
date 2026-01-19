@@ -12,7 +12,6 @@ import holymagic.typeservice.model.leaderboard.WeeklyActivity;
 import holymagic.typeservice.repository.Leaderboard15Repository;
 import holymagic.typeservice.repository.LeaderboardRepository;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

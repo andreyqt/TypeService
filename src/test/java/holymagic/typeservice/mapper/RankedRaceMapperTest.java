@@ -24,7 +24,7 @@ public class RankedRaceMapperTest {
     @BeforeEach
     void setUp() {
         rankedRaceMapper = Mappers.getMapper(RankedRaceMapper.class);
-        rankedRace = (RankedRace) RankedRace.builder()
+        rankedRace = RankedRace.builder()
                 .rank(1)
                 .timestamp(1767014109000L)
                 .name("test_name")
