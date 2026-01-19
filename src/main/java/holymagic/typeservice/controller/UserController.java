@@ -7,6 +7,8 @@ import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.UserStats;
 import holymagic.typeservice.service.UserService;
+import holymagic.typeservice.validator.LeaderboardRequestValidator;
+import holymagic.typeservice.validator.UserRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final UserRequestValidator validator;
 
     @Operation(summary = "Checks if the username available")
     @GetMapping("/checkName/{name}")
@@ -34,6 +37,7 @@ public class UserController {
     @Operation(summary = "Gets user's personal bests")
     @GetMapping("/personalBests/{mode}")
     public ResponseEntity<Map<String, List<PersonalBestDto>>> getPersonalBests(@PathVariable String mode) {
+        validator.validateMode(mode);
         return ResponseEntity.ok(userService.getPersonalBests(mode));
     }
 
@@ -41,6 +45,7 @@ public class UserController {
     @GetMapping("/personalBests/{mode}/{mode2}")
     public ResponseEntity<List<PersonalBestDto>> getPersonalBests(@PathVariable String mode,
                                                                   @PathVariable String mode2) {
+        validator.validateModeCombination(mode, mode2);
         return ResponseEntity.ok(userService.getPersonalBests(mode, mode2));
     }
 
