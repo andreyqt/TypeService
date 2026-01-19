@@ -27,11 +27,8 @@ public class PublicDataServiceTest {
 
     @InjectMocks
     private PublicDataService publicDataService;
-
     @Mock
     private ExchangeService exchangeService;
-    @Mock
-    private RaceRequestValidator raceRequestValidator;
 
     ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
 

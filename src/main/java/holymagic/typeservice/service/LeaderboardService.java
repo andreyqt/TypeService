@@ -7,7 +7,9 @@ import holymagic.typeservice.mapper.RankedRaceMapper;
 import holymagic.typeservice.mapper.WeeklyActivityMapper;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.model.leaderboard.RankedRace15;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
+import holymagic.typeservice.repository.Leaderboard15Repository;
 import holymagic.typeservice.repository.LeaderboardRepository;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
@@ -37,6 +39,7 @@ public class LeaderboardService {
     private final LeaderboardCache leaderboardCache;
     private final ExchangeService exchangeService;
     private final LeaderboardRepository leaderboardRepository;
+    private final Leaderboard15Repository leaderboard15Repository;
 
     @Value("${leaderbaord_batch_size}")
     private int batchSize;
@@ -85,12 +88,40 @@ public class LeaderboardService {
     }
 
     @Transactional
-    public void getAndSave() {
+    public void getAndSave(String mode2) {
         URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                "60", 0, batchSize, null);
+                mode2, 0, batchSize, null);
         List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
-        leaderboardCache.update(races);
-        leaderboardRepository.saveAll(races);
+        switch (mode2) {
+            case "60":
+                if (leaderboardRepository.hasAnyRecords()) {
+                    for (RankedRace race : races) {
+                        RankedRace entity = leaderboardRepository.findByRank(race.getRank());
+                        rankedRaceMapper.updateEntity(race, entity);
+                        leaderboardRepository.save(entity);
+                    }
+                    log.info("updated 60s lbs");
+                } else {
+                    leaderboardRepository.saveAll(races);
+                    log.info("saved 60s lbs");
+                }
+                leaderboardCache.update(races);
+                break;
+            case "15":
+                if (leaderboard15Repository.hasAnyRecords()) {
+                    for (RankedRace race : races) {
+                        RankedRace15 entity = leaderboard15Repository.findByRank(race.getRank());
+                        rankedRaceMapper.updateEntity(race, entity);
+                        leaderboard15Repository.save(entity);
+                    }
+                    log.info("updated 15s lbs");
+                } else {
+                    List<RankedRace15> shortRaces = rankedRaceMapper.toRankedRace15(races);
+                    leaderboard15Repository.saveAll(shortRaces);
+                    log.info("saved 15s lbs");
+                }
+                break;
+        }
     }
 
     @Async("cacheUpdateExecutor")

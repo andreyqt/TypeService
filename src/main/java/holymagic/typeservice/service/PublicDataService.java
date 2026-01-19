@@ -17,10 +17,8 @@ import static holymagic.typeservice.model.ParameterizedTypeReferences.TYPING_STA
 public class PublicDataService {
 
     private final ExchangeService exchangeService;
-    private final LeaderboardRequestValidator validator;
 
     public Map<String, Integer> getSpeedHistogram(String language, String mode, String mode2) {
-        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, null, null);
         URI uri = UriBuilder.fromPath("/public/speedHistogram")
                 .queryParam("language", language)
                 .queryParam("mode", mode)

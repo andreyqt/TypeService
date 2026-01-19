@@ -69,9 +69,16 @@ public class LeaderboardController {
     }
 
     @Operation(summary = "Gets 60s(main) lb for english and saves it to db")
-    @PostMapping("/save")
+    @PostMapping("/save/60")
     public ResponseEntity<String> saveMainLeaderboard() {
-        leaderboardService.getAndSave();
+        leaderboardService.getAndSave("60");
+        return ResponseEntity.ok("leaderboard has been saved");
+    }
+
+    @Operation(summary = "Gets 15s(additional) lb for english and saves it to db")
+    @PostMapping("/save/15")
+    public ResponseEntity<String> saveAdditionalLeaderboard() {
+        leaderboardService.getAndSave("15");
         return ResponseEntity.ok("leaderboard has been saved");
     }
 

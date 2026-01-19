@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changeset/V05_add_consistency_lbs60s.sql
   - include:
       file: db/changelog/changeset/V06_add_raw_lbs60s.sql
+  - include:
+      file: db/changelog/changeset/V07_leaderboards_15s.sql

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class LeaderboardCache {
     private int capacity;
 
     private final ConcurrentSkipListMap<Integer, RankedRace> cache =
-            new ConcurrentSkipListMap<>(Comparator.reverseOrder());
+            new ConcurrentSkipListMap<>();
     private final AtomicBoolean updating = new AtomicBoolean(false);
     private final LeaderboardRepository leaderboardRepository;
     private final PlatformTransactionManager txManager;
@@ -83,7 +82,7 @@ public class LeaderboardCache {
                 return null;
             }
         });
-        if (races != null) {
+        if (races != null && !races.isEmpty()) {
             for (RankedRace race : races) {
                 cache.put(race.getRank(), race);
             }
