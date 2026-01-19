@@ -62,7 +62,7 @@ public class LeaderboardService {
             switch (mode2) {
                 case "60":
                     List<RankedRace> racesFromDb = leaderboardRepository.findAll();
-                    if (racesFromDb == null || racesFromDb.isEmpty()) {
+                    if (racesFromDb.isEmpty()) {
                         log.warn("couldn't receive 60s lb from db");
                     } else {
                         log.info("retrieved 60s lb from db");
@@ -71,7 +71,7 @@ public class LeaderboardService {
                     break;
                 case"15":
                     List<RankedRace15> shortRacesFromDb = leaderboard15Repository.findAll();
-                    if (shortRacesFromDb == null || shortRacesFromDb.isEmpty()) {
+                    if (shortRacesFromDb.isEmpty()) {
                         log.warn("couldn't receive 15s lb from db");
                     } else {
                         log.info("retrieved 15s lb from db");
