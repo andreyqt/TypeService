@@ -7,13 +7,13 @@ import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.UserStats;
 import holymagic.typeservice.service.UserService;
-import holymagic.typeservice.validator.LeaderboardRequestValidator;
 import holymagic.typeservice.validator.UserRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +38,21 @@ public class UserController {
     @GetMapping("/personalBests/{mode}")
     public ResponseEntity<Map<String, List<PersonalBestDto>>> getPersonalBests(@PathVariable String mode) {
         validator.validateMode(mode);
-        return ResponseEntity.ok(userService.getPersonalBests(mode));
+        return ResponseEntity.ok(userService.getPersonalBestDtos(mode));
+    }
+
+    @Operation(summary = "Gets user's personal bests as list")
+    @GetMapping("/personalBests/list/{mode}")
+    public ResponseEntity<List<PersonalBestDto>> getPersonalBestsAsList(@PathVariable String mode) {
+        validator.validateMode(mode);
+        return ResponseEntity.ok(userService.getPersonalBestDtosAsList(mode));
+    }
+
+    @Operation(summary = "Gets and saves or updates personal bests for time and words mode")
+    @PostMapping("/personalBests/save")
+    public ResponseEntity<String> getAndSavePersonalBests() {
+        userService.getAndSavePersonalBests();
+        return ResponseEntity.ok("Saved personal bests");
     }
 
     @Operation(summary = "Gets a user's typing stats data")

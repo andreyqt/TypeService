@@ -72,7 +72,7 @@ public class UserServiceTest {
         Map<String, List<PersonalBest>> records = UserServiceTestData.providePersonalBestsForTimeMode();
         Map<String, List<PersonalBestDto>> expectedRecords = UserServiceTestData.providePersonalBestDtosForTimeMode(records);
         when(exchangeService.makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF))).thenReturn(records);
-        Map<String, List<PersonalBestDto>> actualRecords = userService.getPersonalBests("time");
+        Map<String, List<PersonalBestDto>> actualRecords = userService.getPersonalBestDtos("time");
         assertEquals(expectedRecords, actualRecords);
         verifyExchange(expectedUri, MAP_OF_RECORDS_REF);
     }

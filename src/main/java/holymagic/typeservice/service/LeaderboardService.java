@@ -140,7 +140,7 @@ public class LeaderboardService {
             for (RankedRace race : races) {
                 RankedRace entity = leaderboardRepository.findByRank(race.getRank());
                 rankedRaceMapper.updateEntity(race, entity);
-                leaderboardRepository.save(entity);
+//                leaderboardRepository.save(entity);
             }
             log.info("updated 60s lbs");
         } else {
@@ -156,7 +156,7 @@ public class LeaderboardService {
             for (RankedRace race : races) {
                 RankedRace15 entity = leaderboard15Repository.findByRank(race.getRank());
                 rankedRaceMapper.updateEntity(race, entity);
-                leaderboard15Repository.save(entity);
+//                leaderboard15Repository.save(entity);
             }
             log.info("updated 15s lbs");
         } else {
@@ -197,7 +197,8 @@ public class LeaderboardService {
 
     private boolean canGetFromDb(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
         return (mode2.equals("60") || mode2.equals("15")) && page == null
-                && (pageSize == null || pageSize <= leaderboardCache.getCapacity());
+                && (pageSize == null || pageSize <= leaderboardCache.getCapacity()) &&
+                (friendsOnly == null || !friendsOnly);
     }
 
 }

@@ -16,7 +16,11 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 @SuperBuilder
 public class BaseRankedRace {
+
     @Id
+    @Column(name = "rank")
+    private Integer rank;
+
     @Column(name = "uid")
     private String uid;
 
@@ -43,9 +47,6 @@ public class BaseRankedRace {
 
     @Column(name = "discord_avatar")
     private String discordAvatar;
-
-    @Column(name = "rank")
-    private Integer rank;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)

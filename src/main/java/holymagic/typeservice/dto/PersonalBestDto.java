@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public class PersonalBestDto {
     private Double accuracy;
+    private String mode;
+    private String mode2;
     private Double speed;
     private String language;
     private Boolean punctuation;

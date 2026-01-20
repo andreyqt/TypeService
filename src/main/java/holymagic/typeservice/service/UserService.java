@@ -12,9 +12,11 @@ import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.UserStats;
 import holymagic.typeservice.model.user.Streak;
+import holymagic.typeservice.repository.PersonalBestRepository;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.List;
@@ -37,6 +39,7 @@ public class UserService {
     private final PersonalBestMapper personalBestMapper;
     private final CurrentTestActivityMapper currentTestActivityMapper;
     private final StreakMapper streakMapper;
+    private final PersonalBestRepository personalBestRepository;
 
     public CheckName checkName(String name) {
         URI uri = UriBuilder.fromPath("users/checkName/{name}")
@@ -44,17 +47,57 @@ public class UserService {
         return exchangeService.makeGetRequest(uri, CHECK_NAME_REF);
     }
 
-    public Map<String, List<PersonalBestDto>> getPersonalBests(String mode) {
-        URI uri = UriBuilder.fromPath("/users/personalBests")
-                .queryParam("mode", mode)
-                .build();
-        Map<String, List<PersonalBest>> response = exchangeService.makeGetRequest(uri, MAP_OF_RECORDS_REF);
+    public Map<String, List<PersonalBestDto>> getPersonalBestDtos(String mode) {
+        Map<String, List<PersonalBest>> response = getPersonalBests(mode);
         return response.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> personalBestMapper.toDto(entry.getValue())
                 ));
+    }
+
+    public List<PersonalBestDto> getPersonalBestDtosAsList(String mode) {
+        List<PersonalBest> bps = getPersonalBestsAsList(mode);
+        return personalBestMapper.toDto(bps);
+    }
+
+    public Map<String, List<PersonalBest>> getPersonalBests(String mode) {
+        URI uri = UriBuilder.fromPath("/users/personalBests")
+                .queryParam("mode", mode)
+                .build();
+        return exchangeService.makeGetRequest(uri, MAP_OF_RECORDS_REF);
+    }
+
+    public List<PersonalBest> getPersonalBestsAsList(String mode) {
+        Map<String, List<PersonalBest>> response = getPersonalBests(mode);
+        return response.entrySet()
+                .stream()
+                .map(entry -> {
+                    String mode2 = entry.getKey();
+                    entry.getValue()
+                            .forEach(pb -> {
+                                pb.setMode(mode);
+                                pb.setMode2(mode2);
+                                if (pb.getNumbers() == null) {
+                                    pb.setNumbers(false);
+                                }
+                                if (pb.getPunctuation() == null) {
+                                    pb.setPunctuation(false);
+                                }
+                            });
+                    return entry;
+                })
+                .flatMap(entry -> entry.getValue().stream())
+                .toList();
+    }
+
+    @Transactional
+    public void getAndSavePersonalBests() {
+        List<PersonalBest> timeBests = getPersonalBestsAsList("time");
+        List<PersonalBest> wordsBests = getPersonalBestsAsList("words");
+        personalBestRepository.saveAll(timeBests);
+        personalBestRepository.saveAll(wordsBests);
     }
 
     public List<PersonalBestDto> getPersonalBests(String mode, String mode2) {
@@ -91,4 +134,10 @@ public class UserService {
         Streak streak = exchangeService.makeGetRequest(uri, STREAK_REF);
         return streakMapper.ToDto(streak);
     }
+
+    @Transactional
+    public void savePersonalBests(List<PersonalBest> personalBests) {
+        personalBestRepository.saveAll(personalBests);
+    }
+
 }

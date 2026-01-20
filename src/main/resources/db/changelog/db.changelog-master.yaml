@@ -13,3 +13,7 @@ databaseChangeLog:
       file: db/changelog/changeset/V06_add_raw_lbs60s.sql
   - include:
       file: db/changelog/changeset/V07_leaderboards_15s.sql
+  - include:
+      file: db/changelog/changeset/V08_personal_bests.sql
+  - include:
+      file: db/changelog/changeset/V09_idx_lbs.sql
