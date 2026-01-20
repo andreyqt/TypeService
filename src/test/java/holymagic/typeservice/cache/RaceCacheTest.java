@@ -1,12 +1,16 @@
 package holymagic.typeservice.cache;
 
 import holymagic.typeservice.model.race.Race;
+import holymagic.typeservice.repository.RaceRepository;
 import holymagic.typeservice.service.RaceServiceTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
 
@@ -19,12 +23,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 public class RaceCacheTest {
 
+    @InjectMocks
     private RaceCache raceCache;
+
+    @Mock
+    private RaceRepository raceRepository;
+    @Mock
+    private PlatformTransactionManager txManager;
+
     private List<Race> races;
 
     @BeforeEach
     void setUp() {
-        raceCache = new RaceCache();
         ReflectionTestUtils.setField(raceCache, "capacity", 5);
         ReflectionTestUtils.setField(raceCache, "upperBound", 3);
         races = RaceServiceTestData.provideRaces();
