@@ -2,6 +2,7 @@ package holymagic.typeservice.mapper;
 
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.model.leaderboard.RankedRace15;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,5 +51,18 @@ public class RankedRaceMapperTest {
     public void toDtoTest() {
         RankedRaceDto actualRankedRaceDto = rankedRaceMapper.toDto(rankedRace);
         assertEquals(rankedRaceDto, actualRankedRaceDto);
+    }
+
+    @Test
+    public void toRankedRace15Test() {
+        RankedRace15 shortRace = rankedRaceMapper.toRankedRace15(rankedRace);
+        assertAll(
+            "verify that all fields are equal",
+                () -> assertEquals(rankedRace.getUid(), shortRace.getUid()),
+                () -> assertEquals(rankedRace.getRank(), shortRace.getRank()),
+                () -> assertEquals(rankedRace.getAcc(), shortRace.getAcc()),
+                () -> assertEquals(rankedRace.getName(), shortRace.getName()),
+                () -> assertEquals(rankedRace.getTimestamp(), shortRace.getTimestamp())
+        );
     }
 }

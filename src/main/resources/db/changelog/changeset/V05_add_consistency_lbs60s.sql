@@ -1,0 +1,2 @@
+ALTER TABLE leaderboards_60s
+    ADD COLUMN IF NOT EXISTS consistency DOUBLE PRECISION;

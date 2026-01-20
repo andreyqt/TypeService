@@ -2,6 +2,7 @@ package holymagic.typeservice.controller;
 
 import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.service.RaceService;
+import holymagic.typeservice.validator.RaceRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +22,18 @@ import java.util.List;
 public class RaceController {
 
     private final RaceService raceService;
+    private final RaceRequestValidator validator;
 
     @Operation(summary = "Gets up to 1000 results, if all params are null, then returns races from cache")
     @GetMapping("/")
     public ResponseEntity<List<RaceDto>> getResults(@RequestParam(required = false) Long onOrAfterTimestamp,
                                                     @RequestParam(required = false) Integer offset,
                                                     @RequestParam(required = false) Integer limit) {
+        validator.validateGetResultsArgs(onOrAfterTimestamp, offset, limit);
         return ResponseEntity.ok(raceService.getResults(onOrAfterTimestamp, offset, limit));
     }
 
-    @Operation(summary = "Gets result by id")
+    @Operation(summary = "Gets result by id from http-request")
     @GetMapping("/{id}")
     public ResponseEntity<RaceDto> getRaceById(@PathVariable String id) {
         return ResponseEntity.ok(raceService.getResultByIdFromRequest(id));
@@ -40,6 +43,12 @@ public class RaceController {
     @GetMapping("/timestamp/{timestamp}")
     public ResponseEntity<RaceDto> getRaceByTimestamp(@PathVariable Long timestamp) {
         return ResponseEntity.ok(raceService.getRaceByTimestampFromCache(timestamp));
+    }
+
+    @Operation(summary = "Gets result by id from fache")
+    @GetMapping("/id/{id}")
+    public ResponseEntity<RaceDto> getRaceByIdFromCache(@PathVariable String id) {
+        return ResponseEntity.ok(raceService.getRaceByIdFromCache(id));
     }
 
     @Operation(summary = "Gets a user's last saved result")
@@ -60,13 +69,13 @@ public class RaceController {
         return ResponseEntity.ok(raceService.getRaceByTimestampFromDb(timestamp));
     }
 
-    @Operation(summary = "Saves race by id from cache into db")
+    @Operation(summary = "Gets race from cache by id and saves into db")
     @PostMapping("/save/id/{id}")
     public ResponseEntity<RaceDto> saveRace(@PathVariable String id) {
         return ResponseEntity.ok(raceService.saveRace(id));
     }
 
-    @Operation(summary = "Gets race from cache and saves into db")
+    @Operation(summary = "Gets race from cache by timestamp and saves into db")
     @PostMapping("/save/timestamp/{timestamp}")
     public ResponseEntity<RaceDto> saveRace(@PathVariable Long timestamp) {
         return ResponseEntity.ok(raceService.saveRace(timestamp));

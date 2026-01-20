@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @Entity
-@Table(name = "leaderboards_60s")
-public class RankedRace extends BaseRankedRace {
+@Table(name = "leaderboards_15s")
+public class RankedRace15 extends BaseRankedRace {
 
 }

@@ -1,3 +1,19 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/V01_init.sql
+  - include:
+      file: db/changelog/changeset/V02_idx_races.sql
+  - include:
+      file: db/changelog/changeset/V03_leaderboards_60s.sql
+  - include:
+      file: db/changelog/changeset/V04_pk_lbs_60s.sql
+  - include:
+      file: db/changelog/changeset/V05_add_consistency_lbs60s.sql
+  - include:
+      file: db/changelog/changeset/V06_add_raw_lbs60s.sql
+  - include:
+      file: db/changelog/changeset/V07_leaderboards_15s.sql
+  - include:
+      file: db/changelog/changeset/V08_personal_bests.sql
+  - include:
+      file: db/changelog/changeset/V09_idx_lbs.sql

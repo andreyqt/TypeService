@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,6 +66,20 @@ public class LeaderboardController {
         validator.validatePage(page);
         validator.validatePageSize(pageSize);
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
+    }
+
+    @Operation(summary = "Gets 60s(main) lb for english and saves it to db")
+    @PostMapping("/save/60")
+    public ResponseEntity<String> saveMainLeaderboard() {
+        leaderboardService.getAndSave("60");
+        return ResponseEntity.ok("leaderboard has been saved");
+    }
+
+    @Operation(summary = "Gets 15s(additional) lb for english and saves it to db")
+    @PostMapping("/save/15")
+    public ResponseEntity<String> saveAdditionalLeaderboard() {
+        leaderboardService.getAndSave("15");
+        return ResponseEntity.ok("leaderboard has been saved");
     }
 
 }

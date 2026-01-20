@@ -38,6 +38,8 @@ public class RaceService {
 
     @Value("${default_limit}")
     private int defaultLimit;
+    @Value("${race_cache_initialize_on_start}")
+    private boolean initializeOnStart;
 
     public List<RaceDto> getResults(@Nullable Long onOrAfterTimestamp,
                                     @Nullable Integer offset,
@@ -82,6 +84,14 @@ public class RaceService {
             return raceMapper.toDto(race);
         }
         throw new EntityNotFoundException(String.format("race with timestamp %s was not found in cache", timestamp));
+    }
+
+    public RaceDto getRaceByIdFromCache(String id) {
+        Race race = raceCache.getById(id);
+        if (race != null) {
+            return raceMapper.toDto(race);
+        }
+        throw new EntityNotFoundException(String.format("race with id %s was not found in cache", id));
     }
 
     @Transactional(readOnly = true)
@@ -149,11 +159,17 @@ public class RaceService {
 
     @PostConstruct
     public void initializeCache() {
+        if (!initializeOnStart) {
+            log.info("skipping cache initialization");
+            return;
+        }
         try {
             List<Race> races = exchangeService.makeGetRequest(createCacheUpdateUri(), LIST_OF_RACES_REF);
             raceCache.initialize(races);
+            log.info("race cache has been initialized successfully by http-request");
         } catch (Exception e) {
-            log.error("failed to initialize race cache: {}", e.getMessage());
+            log.error("failed to initialize race cache from http-request: {}", e.getMessage());
+            raceCache.initializeFromDb();
         }
     }
 

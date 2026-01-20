@@ -9,6 +9,8 @@ import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
 import holymagic.typeservice.model.leaderboard.XpLeaderboard;
+import holymagic.typeservice.repository.Leaderboard15Repository;
+import holymagic.typeservice.repository.LeaderboardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,10 @@ public class LeaderboardServiceTest {
     private LeaderboardCache leaderboardCache;
     @Mock
     private ExchangeService exchangeService;
+    @Mock
+    private Leaderboard15Repository leaderboard15Repository;
+    @Mock
+    private LeaderboardRepository leaderboardRepository;
 
     ArgumentCaptor<URI> uriCaptor;
     List<RankedRace> rankedRaces;
