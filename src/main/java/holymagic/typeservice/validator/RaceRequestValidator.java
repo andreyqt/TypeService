@@ -13,6 +13,9 @@ public class RaceRequestValidator {
     private int maxLimit;
 
     public void validateTimestamp(Long timestamp) {
+        if (timestamp == null) {
+            return;
+        }
         if (timestamp < initialTimestamp) {
             throw new DataValidationException("timestamp must be >= " + initialTimestamp);
         }
@@ -23,18 +26,24 @@ public class RaceRequestValidator {
     }
 
     public void validateOffset(Integer offset) {
+        if (offset == null) {
+            return;
+        }
         if (offset < 0 || offset >= maxLimit) {
             throw new DataValidationException("offset can't be negative or exceed " + maxLimit);
         }
     }
 
     public void validateLimit(Integer limit) {
+        if (limit == null) {
+            return;
+        }
         if (limit <= 0 || limit > maxLimit) {
             throw new DataValidationException("limit must be between 0 and " + maxLimit);
         }
     }
 
-    public void validateGetResultsArgs(Long onOrAfterTimestamp, int offset, int limit) {
+    public void validateGetResultsArgs(Long onOrAfterTimestamp, Integer offset, Integer limit) {
         validateTimestamp(onOrAfterTimestamp);
         validateOffset(offset);
         validateLimit(limit);

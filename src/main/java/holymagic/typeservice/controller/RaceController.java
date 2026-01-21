@@ -45,7 +45,7 @@ public class RaceController {
         return ResponseEntity.ok(raceService.getRaceByTimestampFromCache(timestamp));
     }
 
-    @Operation(summary = "Gets result by id from fache")
+    @Operation(summary = "Gets result by id from cache")
     @GetMapping("/id/{id}")
     public ResponseEntity<RaceDto> getRaceByIdFromCache(@PathVariable String id) {
         return ResponseEntity.ok(raceService.getRaceByIdFromCache(id));
