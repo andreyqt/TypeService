@@ -62,7 +62,7 @@ public class RaceCache {
     }
 
     public void add(Race race) {
-        if(cache.isEmpty()){
+        if(cache.size() < capacity){
             cache.put(race.getTimestamp(), race);
         }
         if (race.getTimestamp() > cache.lastKey()) {
