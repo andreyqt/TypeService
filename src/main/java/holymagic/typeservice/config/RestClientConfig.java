@@ -40,7 +40,7 @@ public class RestClientConfig {
         return (request, response) -> {
             HttpStatusCode statusCode = response.getStatusCode();
             String statusText = response.getStatusText();
-            log.error("Request failed! \n method: {} \n uri: {} \n code: {}, {} \n timestamp: {}",
+            log.error("Bad request! \n method: {} \n uri: {} \n code: {}, {} \n timestamp: {}",
                     request.getMethod(), request.getURI(), statusCode, statusText, LocalDateTime.now());
             throw new HttpClientErrorException(statusCode, statusText);
         };
