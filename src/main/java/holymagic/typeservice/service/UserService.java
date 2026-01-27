@@ -139,9 +139,4 @@ public class UserService {
         return streakMapper.ToDto(streak);
     }
 
-    @Transactional
-    public void savePersonalBests(List<PersonalBest> personalBests) {
-        personalBestRepository.saveAll(personalBests);
-    }
-
 }
