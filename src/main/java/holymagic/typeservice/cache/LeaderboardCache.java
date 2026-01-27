@@ -38,7 +38,7 @@ public class LeaderboardCache {
     }
 
     public List<RankedRace> getAll() {
-        return new ArrayList<>(cache.descendingMap().values());
+        return new ArrayList<>(cache.values());
     }
 
     public List<RankedRace> getSome(Integer quantity) {

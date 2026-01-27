@@ -11,8 +11,11 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RaceDtoExcelService extends AbstractExcelService<RaceDto> {
+
+    public RaceDtoExcelService() {
+        super();
+    }
 
     @Override
     public void writeToRow(Row row, RaceDto dto) {
