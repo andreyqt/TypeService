@@ -96,8 +96,12 @@ public class UserService {
     public void getAndSavePersonalBests() {
         List<PersonalBest> timeBests = getPersonalBestsAsList("time");
         List<PersonalBest> wordsBests = getPersonalBestsAsList("words");
-        personalBestRepository.saveAll(timeBests);
-        personalBestRepository.saveAll(wordsBests);
+        for (PersonalBest personalBest : timeBests) {
+            personalBestRepository.upsert(personalBest);
+        }
+        for (PersonalBest personalBest : wordsBests) {
+            personalBestRepository.upsert(personalBest);
+        }
     }
 
     public List<PersonalBestDto> getPersonalBests(String mode, String mode2) {
