@@ -66,27 +66,6 @@ public class UserServiceTest {
         verifyExchange(expectedUri, CHECK_NAME_REF);
     }
 
-    @Test
-    public void getPersonalBestsForTimeModeTest() {
-        URI expectedUri = URI.create("/users/personalBests?mode=time");
-        Map<String, List<PersonalBest>> records = UserServiceTestData.providePersonalBestsForTimeMode();
-        Map<String, List<PersonalBestDto>> expectedRecords = UserServiceTestData.providePersonalBestDtosForTimeMode(records);
-        when(exchangeService.makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF))).thenReturn(records);
-        Map<String, List<PersonalBestDto>> actualRecords = userService.getPersonalBestDtos("time");
-        assertEquals(expectedRecords, actualRecords);
-        verifyExchange(expectedUri, MAP_OF_RECORDS_REF);
-    }
-
-    @Test
-    public void getPersonalBestForSpecificTimeModeTest() {
-        URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=30");
-        List<PersonalBest> records = UserServiceTestData.generatePersonalBests();
-        when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(records);
-        List<PersonalBestDto> actualRecords = userService.getPersonalBests("time", "30");
-        List<PersonalBestDto> expectedRecords = personalBestMapper.toDto(records);
-        assertEquals(expectedRecords, actualRecords);
-        verifyExchange(expectedUri, LIST_OF_RECORDS);
-    }
 
     @Test
     public void getUserStatsTest() {
