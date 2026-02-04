@@ -1,12 +1,10 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.dto.CurrentTestActivityDto;
-import holymagic.typeservice.dto.PersonalBestDto;
 import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
-import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
@@ -22,13 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CURRENT_TEST_ACTIVITY_REF;
-import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RECORDS;
-import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_RECORDS_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.PROFILE_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.STREAK_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.USER_STATS_REF;
