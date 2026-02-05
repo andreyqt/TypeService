@@ -4,7 +4,8 @@ import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.XpLeaderboard;
 import holymagic.typeservice.model.publicData.TypingStats;
-import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.result.Result;
+import holymagic.typeservice.model.user.PersonalBest;
 import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
@@ -39,10 +40,10 @@ public class ParameterizedTypeReferences {
     public static final ParameterizedTypeReference<Response<Streak>> STREAK_REF =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<Response<List<Race>>> LIST_OF_RACES_REF =
+    public static final ParameterizedTypeReference<Response<List<Result>>> LIST_OF_RESULTS_REF =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<Response<Race>> RACE_REF =
+    public static final ParameterizedTypeReference<Response<Result>> RESULT_REF =
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<Map<String, Integer>>> SPEED_HISTOGRAM_REF =

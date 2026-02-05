@@ -1,6 +1,5 @@
 package holymagic.typeservice.service;
 
-import holymagic.typeservice.cache.LeaderboardCache;
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.mapper.RankedRaceMapperImpl;
@@ -9,10 +8,7 @@ import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
 import holymagic.typeservice.model.leaderboard.XpLeaderboard;
-import holymagic.typeservice.repository.Leaderboard15Repository;
-import holymagic.typeservice.repository.LeaderboardRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -46,13 +42,7 @@ public class LeaderboardServiceTest {
     @Spy
     private WeeklyActivityMapperImpl weeklyActivityMapper;
     @Mock
-    private LeaderboardCache leaderboardCache;
-    @Mock
     private ExchangeService exchangeService;
-    @Mock
-    private Leaderboard15Repository leaderboard15Repository;
-    @Mock
-    private LeaderboardRepository leaderboardRepository;
 
     ArgumentCaptor<URI> uriCaptor;
     List<RankedRace> rankedRaces;
@@ -66,33 +56,6 @@ public class LeaderboardServiceTest {
         rankedRaceDtos = LeaderboardServiceTestData.provideRankedRaceDtos();
         leaderboard = new Leaderboard(rankedRaces.size(), rankedRaces);
     }
-
-    @Test
-    @DisplayName("retrieving results not from cache")
-    public void getLeaderboardFromCacheTest() {
-        URI expectedUri = URI.create("/leaderboards?language=english&mode=time&mode2=60");
-        when(exchangeService.makeGetRequest(any(URI.class), eq(LEADERBOARD_REF))).thenReturn(leaderboard);
-        when(leaderboardCache.getSome(null)).thenReturn(null);
-        List<RankedRaceDto> actualDtos = leaderboardService.getLeaderboard("english", "time", "60",
-                null, null, null);
-        assertEquals(rankedRaceDtos, actualDtos);
-        verifyExchange(expectedUri, LEADERBOARD_REF);
-        verify(leaderboardCache, times(1)).getSome(null);
-        verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
-    }
-
-    @Test
-    @DisplayName("retrieving results from cache")
-    public void getLeaderboardFromRequestTest() {
-        when(leaderboardCache.getSome(null)).thenReturn(leaderboard.getEntries());
-        List<RankedRaceDto> actualDtos = leaderboardService.getLeaderboard("english", "time", "60",
-                null, null, null);
-        assertEquals(rankedRaceDtos, actualDtos);
-        verify(leaderboardCache, times(1)).getSome(null);
-        verify(rankedRaceMapper, times(1)).toDto(rankedRaces);
-        verify(exchangeService, times(0)).makeGetRequest(any(URI.class), eq(LEADERBOARD_REF));
-    }
-
 
     @Test
     public void getRankTest() {

@@ -1,7 +1,7 @@
 package holymagic.typeservice.repository;
 
-import holymagic.typeservice.model.race.PersonalBest;
-import holymagic.typeservice.model.race.PersonalBestId;
+import holymagic.typeservice.model.user.PersonalBest;
+import holymagic.typeservice.model.user.PersonalBestId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

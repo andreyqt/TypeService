@@ -35,4 +35,5 @@ public class CurrentTestActivityMapperTest {
         CurrentTestActivityDto actualTestActivityDto = mapper.toDto(currentTestActivity);
         assertEquals(currentTestActivityDto, actualTestActivityDto);
     }
+
 }

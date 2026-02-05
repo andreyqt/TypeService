@@ -1,7 +1,7 @@
 package holymagic.typeservice.mapper;
 
 import holymagic.typeservice.dto.PersonalBestDto;
-import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.user.PersonalBest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

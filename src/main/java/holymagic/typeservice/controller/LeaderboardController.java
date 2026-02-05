@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/leaderboards")
+@RequestMapping("/leaderboards")
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
@@ -66,20 +66,6 @@ public class LeaderboardController {
         validator.validatePage(page);
         validator.validatePageSize(pageSize);
         return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
-    }
-
-    @Operation(summary = "Gets 60s(main) lb for english and saves it to db")
-    @PostMapping("/save/60")
-    public ResponseEntity<String> saveMainLeaderboard() {
-        leaderboardService.getAndSave("60");
-        return ResponseEntity.ok("leaderboard has been saved");
-    }
-
-    @Operation(summary = "Gets 15s(additional) lb for english and saves it to db")
-    @PostMapping("/save/15")
-    public ResponseEntity<String> saveAdditionalLeaderboard() {
-        leaderboardService.getAndSave("15");
-        return ResponseEntity.ok("leaderboard has been saved");
     }
 
 }

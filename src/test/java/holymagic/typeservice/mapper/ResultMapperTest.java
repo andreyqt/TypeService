@@ -1,7 +1,7 @@
 package holymagic.typeservice.mapper;
 
-import holymagic.typeservice.dto.RaceDto;
-import holymagic.typeservice.model.race.Race;
+import holymagic.typeservice.dto.ResultDto;
+import holymagic.typeservice.model.result.Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,21 +9,23 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class RaceMapperTest {
+public class ResultMapperTest {
 
-    private RaceMapper mapper;
-    private Race race;
-    private RaceDto expectedRaceDto;
+    private ResultMapper mapper;
+    private Result result;
+    private ResultDto expectedResultDto;
 
     @BeforeEach
     void setUp() {
-        mapper = Mappers.getMapper(RaceMapper.class);
-        int[] charStats = {627, 0, 0, 0};
-        race = Race.builder()
+        mapper = Mappers.getMapper(ResultMapper.class);
+        List<Integer> charStats = Arrays.asList(100,2,2,4);
+        result = Result.builder()
                 .wpm(100.)
                 .acc(100.)
                 .mode("time")
@@ -34,13 +36,13 @@ public class RaceMapperTest {
                 .charStats(charStats)
                 .timestamp(1767014109000L)
                 .build();
-        expectedRaceDto = RaceDto.builder()
+        expectedResultDto = ResultDto.builder()
                 .speed(100.)
                 .accuracy(100.)
                 .mode("time")
                 .mode2("30")
                 .testDuration(29.99)
-                .chars(627)
+                .chars(100)
                 .id("1abc")
                 .uid("1abc1def")
                 .localDateTime(LocalDateTime.of(2025, 12, 29, 16, 15, 9))
@@ -49,7 +51,8 @@ public class RaceMapperTest {
 
     @Test
     public void toRaceDtoTest() {
-        RaceDto actualRaceDto = mapper.toDto(race);
-        assertEquals(expectedRaceDto, actualRaceDto);
+        ResultDto actualResultDto = mapper.toDto(result);
+        assertEquals(expectedResultDto, actualResultDto);
     }
+
 }

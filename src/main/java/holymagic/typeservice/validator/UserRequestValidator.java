@@ -1,6 +1,7 @@
 package holymagic.typeservice.validator;
 
 import holymagic.typeservice.exception.DataValidationException;
+import holymagic.typeservice.exception.ParamValidationException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,14 +23,14 @@ public class UserRequestValidator {
 
     public void validateLanguage(String language) {
         if (!ALLOWED_LANGUAGES_FOR_PERSONAL_BESTS.contains(language)) {
-            throw new DataValidationException("Invalid language " + language);
+            throw new ParamValidationException("Invalid language " + language);
         }
     }
 
     public void validateModeCombination(String mode, String mode2) {
         if (!ALLOWED_MODES_FOR_PERSONAL_BESTS.containsKey(mode) ||
         !ALLOWED_MODES_FOR_PERSONAL_BESTS.get(mode).contains(mode2)) {
-            throw new DataValidationException(String.format("invalid mode combination: %s, %s", mode, mode2));
+            throw new ParamValidationException(String.format("invalid mode combination: %s, %s", mode, mode2));
         }
     }
 

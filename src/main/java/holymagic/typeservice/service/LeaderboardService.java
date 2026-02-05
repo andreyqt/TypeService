@@ -1,25 +1,18 @@
 package holymagic.typeservice.service;
 
-import holymagic.typeservice.cache.LeaderboardCache;
 import holymagic.typeservice.dto.RankedRaceDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.mapper.RankedRaceMapper;
 import holymagic.typeservice.mapper.WeeklyActivityMapper;
 import holymagic.typeservice.model.leaderboard.Leaderboard;
 import holymagic.typeservice.model.leaderboard.RankedRace;
-import holymagic.typeservice.model.leaderboard.RankedRace15;
 import holymagic.typeservice.model.leaderboard.WeeklyActivity;
-import holymagic.typeservice.repository.Leaderboard15Repository;
-import holymagic.typeservice.repository.LeaderboardRepository;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.List;
@@ -35,11 +28,7 @@ public class LeaderboardService {
 
     private final RankedRaceMapper rankedRaceMapper;
     private final WeeklyActivityMapper weeklyActivityMapper;
-    private final LeaderboardCache leaderboardCache;
     private final ExchangeService exchangeService;
-    private final LeaderboardRepository leaderboardRepository;
-    private final Leaderboard15Repository leaderboard15Repository;
-
 
     @Value("${leaderboard_batch_size}")
     private int batchSize;
@@ -47,39 +36,6 @@ public class LeaderboardService {
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
                                               @Nullable Boolean friendsOnly) {
-
-        if (canGetFromCache(mode2, page, pageSize, friendsOnly)) {
-            List<RankedRace> racesFromCache = leaderboardCache.getSome(pageSize);
-            if (racesFromCache == null || racesFromCache.isEmpty()) {
-                log.warn("couldn't receive lb from cache");
-            } else {
-                log.info("retrieved lb from cache");
-                return rankedRaceMapper.toDto(racesFromCache);
-            }
-        }
-
-        if (canGetFromDb(mode2, page, pageSize, friendsOnly)) {
-            switch (mode2) {
-                case "60":
-                    List<RankedRace> racesFromDb = leaderboardRepository.findAll();
-                    if (racesFromDb.isEmpty()) {
-                        log.warn("couldn't receive 60s lb from db");
-                    } else {
-                        log.info("retrieved 60s lb from db");
-                        return rankedRaceMapper.toDto(racesFromDb);
-                    }
-                    break;
-                case"15":
-                    List<RankedRace15> shortRacesFromDb = leaderboard15Repository.findAll();
-                    if (shortRacesFromDb.isEmpty()) {
-                        log.warn("couldn't receive 15s lb from db");
-                    } else {
-                        log.info("retrieved 15s lb from db");
-                        return shortRacesFromDb.stream().map(rankedRaceMapper::toDto).toList();
-                    }
-                    break;
-            }
-        }
 
         URI uri = prepareGetLeaderboardUri("/leaderboards", language, mode, mode2, page, pageSize, friendsOnly);
         Leaderboard leaderboard = exchangeService.makeGetRequest(uri, LEADERBOARD_REF);
@@ -110,60 +66,6 @@ public class LeaderboardService {
         return weeklyActivityMapper.toDto(activity);
     }
 
-    @Transactional
-    public void getAndSave(String mode2) {
-        URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                mode2, 0, batchSize, null);
-        List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
-        switch (mode2) {
-            case "60":
-                saveMainLeaderboard(races);
-                break;
-            case "15":
-                saveAdditionalLeaderboard(races);
-                break;
-        }
-    }
-
-    @Async("cacheUpdateExecutor")
-    @Scheduled(cron = "${leaderboard_update_cron}")
-    public void updateLeaderboardCacheAsync() {
-        URI uri = prepareGetLeaderboardUri("/leaderboards", "english", "time",
-                "60", 0, leaderboardCache.getCapacity(), null);
-        List<RankedRace> races = exchangeService.makeGetRequest(uri, LEADERBOARD_REF).getEntries();
-        leaderboardCache.update(races);
-    }
-
-    @Transactional
-    public void saveMainLeaderboard(List<RankedRace> races) {
-        if (leaderboardRepository.hasAnyRecords()) {
-            for (RankedRace race : races) {
-                RankedRace entity = leaderboardRepository.findByRank(race.getRank());
-                rankedRaceMapper.updateEntity(race, entity);
-            }
-            log.info("updated 60s lbs");
-        } else {
-            leaderboardRepository.saveAll(races);
-            log.info("saved 60s lbs");
-        }
-        leaderboardCache.update(races);
-    }
-
-    @Transactional
-    public void saveAdditionalLeaderboard(List<RankedRace> races) {
-        if (leaderboard15Repository.hasAnyRecords()) {
-            for (RankedRace race : races) {
-                RankedRace15 entity = leaderboard15Repository.findByRank(race.getRank());
-                rankedRaceMapper.updateEntity(race, entity);
-            }
-            log.info("updated 15s lbs");
-        } else {
-            List<RankedRace15> shortRaces = rankedRaceMapper.toRankedRace15(races);
-            leaderboard15Repository.saveAll(shortRaces);
-            log.info("saved 15s lbs");
-        }
-    }
-
     private URI prepareGetLeaderboardUri(String path, String language, String mode, String mode2,
                                          @Nullable Integer page, @Nullable Integer pageSize,
                                          @Nullable Boolean friendsOnly) {
@@ -186,17 +88,6 @@ public class LeaderboardService {
             builder.queryParam("friendsOnly", friendsOnly);
         }
         return builder.build();
-    }
-
-    private boolean canGetFromCache(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
-        return mode2.equals("60") && (friendsOnly == null || !friendsOnly) && page == null
-                && (pageSize == null || pageSize <= leaderboardCache.getCapacity());
-    }
-
-    private boolean canGetFromDb(String mode2, Integer page, Integer pageSize, Boolean friendsOnly) {
-        return (mode2.equals("60") || mode2.equals("15")) && page == null
-                && (pageSize == null || pageSize <= leaderboardCache.getCapacity()) &&
-                (friendsOnly == null || !friendsOnly);
     }
 
 }

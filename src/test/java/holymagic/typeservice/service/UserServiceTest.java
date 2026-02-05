@@ -1,12 +1,13 @@
 package holymagic.typeservice.service;
 
+import holymagic.typeservice.MyTestUtils;
 import holymagic.typeservice.dto.CurrentTestActivityDto;
 import holymagic.typeservice.dto.PersonalBestDto;
 import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
-import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.user.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
@@ -63,7 +64,7 @@ public class UserServiceTest {
         when(exchangeService.makeGetRequest(any(URI.class), eq(CHECK_NAME_REF))).thenReturn(checkName);
         CheckName result = userService.checkName("test_name");
         assertEquals(checkName, result);
-        verifyExchange(expectedUri, CHECK_NAME_REF);
+        MyTestUtils.verifyExchange(expectedUri, CHECK_NAME_REF, exchangeService, uriCaptor);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class UserServiceTest {
         URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=60");
         when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(pbs);
         List<PersonalBestDto> result = userService.getPersonalBests("time", "60", "english");
-        verifyExchange(expectedUri, LIST_OF_RECORDS);
+        MyTestUtils.verifyExchange(expectedUri, LIST_OF_RECORDS, exchangeService, uriCaptor);
         assertEquals(5, result.size());
     }
 
@@ -96,7 +97,7 @@ public class UserServiceTest {
         when(exchangeService.makeGetRequest(any(URI.class), eq(USER_STATS_REF))).thenReturn(stats);
         UserStats actualStats = userService.getUserStats();
         assertEquals(stats, actualStats);
-        verifyExchange(expectedUri, USER_STATS_REF);
+        MyTestUtils.verifyExchange(expectedUri, USER_STATS_REF, exchangeService, uriCaptor);
     }
 
     @Test
@@ -106,7 +107,7 @@ public class UserServiceTest {
         when(exchangeService.makeGetRequest(any(URI.class), eq(PROFILE_REF))).thenReturn(profile);
         Profile actualProfile = userService.getProfile("test_name_123");
         assertEquals(profile, actualProfile);
-        verifyExchange(expectedUri, PROFILE_REF);
+        MyTestUtils.verifyExchange(expectedUri, PROFILE_REF, exchangeService, uriCaptor);
     }
 
     @Test
@@ -117,7 +118,7 @@ public class UserServiceTest {
         CurrentTestActivityDto expectedActivity = currentTestActivityMapper.toDto(activity);
         CurrentTestActivityDto actualActivity = userService.getCurrentTestActivity();
         assertEquals(expectedActivity, actualActivity);
-        verifyExchange(expectedUri, CURRENT_TEST_ACTIVITY_REF);
+        MyTestUtils.verifyExchange(expectedUri, CURRENT_TEST_ACTIVITY_REF, exchangeService, uriCaptor);
     }
 
     @Test
@@ -128,12 +129,7 @@ public class UserServiceTest {
         StreakDto actualStreak = userService.getStreak();
         StreakDto expectedStreak = streakMapper.ToDto(streak);
         assertEquals(expectedStreak, actualStreak);
-        verifyExchange(expectedUri, STREAK_REF);
-    }
-
-    public void verifyExchange(URI expectedUri, ParameterizedTypeReference reference) {
-        verify(exchangeService, times(1)).makeGetRequest(uriCaptor.capture(), eq(reference));
-        assertEquals(expectedUri, uriCaptor.getValue());
+        MyTestUtils.verifyExchange(expectedUri, STREAK_REF, exchangeService, uriCaptor);
     }
 
 }
