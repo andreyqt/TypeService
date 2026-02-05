@@ -38,7 +38,7 @@ public class ResultExcelServiceTest {
     @Test
     public void readTest() {
         List<RaceDto> result = excelService.read(testFilePath);
-        assertEquals(1, result.size());
+        assertEquals(5, result.size());
         assertEquals(raceDto, result.getFirst());
     }
 
