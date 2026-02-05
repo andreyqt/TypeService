@@ -30,9 +30,6 @@ public class LeaderboardService {
     private final WeeklyActivityMapper weeklyActivityMapper;
     private final ExchangeService exchangeService;
 
-    @Value("${leaderboard_batch_size}")
-    private int batchSize;
-
     public List<RankedRaceDto> getLeaderboard(String language, String mode, String mode2,
                                               @Nullable Integer page, @Nullable Integer pageSize,
                                               @Nullable Boolean friendsOnly) {

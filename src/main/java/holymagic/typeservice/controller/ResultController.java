@@ -1,12 +1,10 @@
 package holymagic.typeservice.controller;
 
 import holymagic.typeservice.dto.ResultDto;
-import holymagic.typeservice.model.result.Result;
 import holymagic.typeservice.service.ResultService;
 import holymagic.typeservice.validator.ResultRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -7,9 +7,9 @@ import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
-import holymagic.typeservice.model.user.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
+import holymagic.typeservice.model.user.PersonalBest;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.Streak;
 import holymagic.typeservice.model.user.UserStats;
@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
 import java.util.List;

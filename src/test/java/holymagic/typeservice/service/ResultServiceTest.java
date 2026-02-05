@@ -2,7 +2,6 @@ package holymagic.typeservice.service;
 
 import holymagic.typeservice.MyTestUtils;
 import holymagic.typeservice.dto.ResultDto;
-import holymagic.typeservice.mapper.ResultMapper;
 import holymagic.typeservice.mapper.ResultMapperImpl;
 import holymagic.typeservice.model.result.Result;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RESULTS_REF;
