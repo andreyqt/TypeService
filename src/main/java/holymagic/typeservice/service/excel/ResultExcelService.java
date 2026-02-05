@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-public class RaceDtoExcelService extends AbstractExcelService<RaceDto> {
+public class ResultExcelService extends AbstractExcelService<RaceDto> {
 
-    public RaceDtoExcelService() {
+    public ResultExcelService() {
         super();
     }
 

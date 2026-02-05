@@ -6,7 +6,6 @@ import holymagic.typeservice.model.leaderboard.XpLeaderboard;
 import holymagic.typeservice.model.publicData.TypingStats;
 import holymagic.typeservice.model.result.Result;
 import holymagic.typeservice.model.user.PersonalBest;
-import holymagic.typeservice.model.race.Race;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
