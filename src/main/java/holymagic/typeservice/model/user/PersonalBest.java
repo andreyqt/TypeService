@@ -1,4 +1,4 @@
-package holymagic.typeservice.model.race;
+package holymagic.typeservice.model.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,11 +34,11 @@ public class PersonalBest {
 
     @Id
     @Column(name = "punctuation")
-    private Boolean punctuation = false;
+    private Boolean punctuation;
 
     @Id
     @Column(name = "numbers")
-    private Boolean numbers = false;
+    private Boolean numbers;
 
     @Column(name = "acc")
     private Double acc;
@@ -54,12 +54,5 @@ public class PersonalBest {
 
     @Column(name = "timestamp")
     private Long timestamp;
-
-//    @PrePersist
-//    @PreUpdate
-//    public void ensureDefaults() {
-//        if (this.punctuation == null) this.punctuation = false;
-//        if (this.numbers == null) this.numbers = false;
-//    }
 
 }

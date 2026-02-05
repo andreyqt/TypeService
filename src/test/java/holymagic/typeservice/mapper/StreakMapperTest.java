@@ -39,4 +39,5 @@ public class StreakMapperTest {
         StreakDto actualDto = mapper.ToDto(streak);
         assertEquals(streakDto, actualDto);
     }
+
 }

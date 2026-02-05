@@ -1,6 +1,6 @@
 package holymagic.typeservice.service;
 
-import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.user.PersonalBest;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
 import holymagic.typeservice.model.user.Streak;

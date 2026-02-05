@@ -64,4 +64,10 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler(ParamValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleParamValidationException(ParamValidationException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 }

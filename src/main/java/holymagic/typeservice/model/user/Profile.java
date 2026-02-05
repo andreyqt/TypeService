@@ -1,6 +1,5 @@
 package holymagic.typeservice.model.user;
 
-import holymagic.typeservice.model.race.PersonalBest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

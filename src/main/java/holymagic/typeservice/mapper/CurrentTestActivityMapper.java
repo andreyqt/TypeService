@@ -13,6 +13,7 @@ import java.time.ZoneId;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CurrentTestActivityMapper {
+
     @Mapping(source = "lastDay", target = "lastDay", qualifiedByName = "mapLongToLocalDateTime")
     CurrentTestActivityDto toDto(CurrentTestActivity currentTestActivity);
 
@@ -21,4 +22,5 @@ public interface CurrentTestActivityMapper {
         Instant instant = Instant.ofEpochMilli(lastDay);
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
+
 }

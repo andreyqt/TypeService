@@ -44,4 +44,5 @@ public class WeeklyActivityMapperTest {
         WeeklyActivityDto actualWeeklyActivityDto = mapper.toDto(weeklyActivity);
         assertEquals(weeklyActivityDto, actualWeeklyActivityDto);
     }
+
 }

@@ -1,6 +1,7 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.dto.RaceDto;
+import holymagic.typeservice.service.excel.ResultExcelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,15 +13,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class RaceDtoExcelServiceTest {
+public class ResultExcelServiceTest {
 
-    private RaceDtoExcelService excelService;
+    private ResultExcelService excelService;
     private RaceDto raceDto;
     private String testFilePath;
 
     @BeforeEach
     public void setUp() {
-        excelService = new RaceDtoExcelService();
+        excelService = new ResultExcelService();
         testFilePath = "C:\\Users\\User\\Documents\\MTT\\TS_test.xlsx";
         raceDto = RaceDto.builder()
                 .id("1s23")
@@ -37,7 +38,7 @@ public class RaceDtoExcelServiceTest {
     @Test
     public void readTest() {
         List<RaceDto> result = excelService.read(testFilePath);
-        assertEquals(1, result.size());
+        assertEquals(5, result.size());
         assertEquals(raceDto, result.getFirst());
     }
 

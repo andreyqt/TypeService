@@ -65,4 +65,5 @@ public class RankedRaceMapperTest {
                 () -> assertEquals(rankedRace.getTimestamp(), shortRace.getTimestamp())
         );
     }
+
 }

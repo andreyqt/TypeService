@@ -1,4 +1,4 @@
-package holymagic.typeservice.model.race;
+package holymagic.typeservice.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

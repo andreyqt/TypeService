@@ -1,4 +1,4 @@
-package holymagic.typeservice.model.race;
+package holymagic.typeservice.model.result;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
@@ -12,13 +12,16 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "races")
-public class Race {
+@Table(name = "results")
+public class Result {
+
     @Id
     @Column(name = "id")
     @JsonProperty("_id")
@@ -27,9 +30,9 @@ public class Race {
     @Column(name = "uid")
     private String uid;
 
-    @Column(name = "char_stats", columnDefinition = "int[]")
+    @Column(name = "char_stats", columnDefinition = "integer[4]")
     @JdbcTypeCode(SqlTypes.ARRAY)
-    private int[] charStats = new int[4];
+    private List<Integer> charStats;
 
     @Column(name = "wpm")
     private Double wpm;
@@ -48,4 +51,5 @@ public class Race {
 
     @Column(name = "test_duration")
     private Double testDuration;
+
 }

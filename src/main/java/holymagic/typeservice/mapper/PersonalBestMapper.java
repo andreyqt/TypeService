@@ -1,7 +1,7 @@
 package holymagic.typeservice.mapper;
 
 import holymagic.typeservice.dto.PersonalBestDto;
-import holymagic.typeservice.model.race.PersonalBest;
+import holymagic.typeservice.model.user.PersonalBest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -15,6 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PersonalBestMapper {
+
     @Mappings({
             @Mapping(source = "acc", target = "accuracy"),
             @Mapping(source = "wpm", target = "speed"),
@@ -31,4 +32,5 @@ public interface PersonalBestMapper {
     default List<PersonalBestDto> toDto(List<PersonalBest> personalBests) {
         return personalBests.stream().map(this::toDto).toList();
     }
+
 }
