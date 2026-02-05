@@ -43,6 +43,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.boot:spring-boot-starter-jersey-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     runtimeOnly 'org.postgresql:postgresql'

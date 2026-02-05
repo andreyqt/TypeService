@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -47,7 +50,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
-        log.error(e.getMessage());
+        log.error("{}: {}", e.getClass().getName(), e.getMessage());
+        String stackTrace = Arrays.stream(e.getStackTrace())
+                .map(StackTraceElement::toString)
+                .collect(Collectors.joining("\n"));
+        log.error("StackTrace:\n {}", stackTrace);
         return new ErrorResponse("Something went wrong :(");
     }
 

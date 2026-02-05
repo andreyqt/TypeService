@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,33 +34,32 @@ public class UserController {
         return ResponseEntity.ok(userService.checkName(name));
     }
 
-    @Operation(summary = "Gets user's personal bests")
-    @GetMapping("/personalBests/{mode}")
-    public ResponseEntity<Map<String, List<PersonalBestDto>>> getPersonalBests(@PathVariable String mode) {
-        validator.validateMode(mode);
-        return ResponseEntity.ok(userService.getPersonalBestDtos(mode));
+    @Operation(summary = "Gets user's personal bests for certain mode and language")
+    @GetMapping("/personalBests")
+    public ResponseEntity<List<PersonalBestDto>> getPersonalBests(
+            @RequestParam(required = false, defaultValue = "time") String mode,
+            @RequestParam(required = false, defaultValue = "60") String mode2,
+            @RequestParam(required = false, defaultValue = "english") String language) {
+        validator.validateModeCombination(mode, mode2);
+        validator.validateLanguage(language);
+        return ResponseEntity.ok(userService.getPersonalBests(mode, mode2, language));
     }
 
-    @Operation(summary = "Gets user's personal bests as list")
-    @GetMapping("/personalBests/list/{mode}")
-    public ResponseEntity<List<PersonalBestDto>> getPersonalBestsAsList(@PathVariable String mode) {
-        validator.validateMode(mode);
-        return ResponseEntity.ok(userService.getPersonalBestDtosAsList(mode));
+    @Operation(summary = "Gets user's personal bests for time/words modes and language")
+    @GetMapping("/personalBests/all")
+    public ResponseEntity<List<PersonalBestDto>> getAllPersonalBests(
+            @RequestParam(required = false, defaultValue = "english") String language) {
+        validator.validateLanguage(language);
+        return ResponseEntity.ok(userService.getAllPersonalBestDtos(language));
     }
 
     @Operation(summary = "Gets and saves or updates personal bests for time and words mode")
     @PostMapping("/personalBests/save")
-    public ResponseEntity<String> getAndSavePersonalBests() {
-        userService.getAndSavePersonalBests();
+    public ResponseEntity<String> savePersonalBests(
+            @RequestParam(required = false, defaultValue = "english") String language) {
+        validator.validateLanguage(language);
+        userService.savePersonalBests(language);
         return ResponseEntity.ok("Saved personal bests");
-    }
-
-    @Operation(summary = "Gets a user's typing stats data")
-    @GetMapping("/personalBests/{mode}/{mode2}")
-    public ResponseEntity<List<PersonalBestDto>> getPersonalBests(@PathVariable String mode,
-                                                                  @PathVariable String mode2) {
-        validator.validateModeCombination(mode, mode2);
-        return ResponseEntity.ok(userService.getPersonalBests(mode, mode2));
     }
 
     @Operation(summary = "Gets a user's typing stats data")

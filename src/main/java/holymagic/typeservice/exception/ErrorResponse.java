@@ -1,10 +1,9 @@
 package holymagic.typeservice.exception;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
 
-@Getter
-@RequiredArgsConstructor
-public class ErrorResponse {
-    private final String message;
+public record ErrorResponse(String message, LocalDateTime timestamp) {
+    public ErrorResponse(String message) {
+        this(message, LocalDateTime.now());
+    }
 }

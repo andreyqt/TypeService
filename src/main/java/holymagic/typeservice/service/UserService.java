@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CURRENT_TEST_ACTIVITY_REF;
@@ -47,70 +47,73 @@ public class UserService {
         return exchangeService.makeGetRequest(uri, CHECK_NAME_REF);
     }
 
-    public Map<String, List<PersonalBestDto>> getPersonalBestDtos(String mode) {
-        Map<String, List<PersonalBest>> response = getPersonalBests(mode);
-        return response.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> personalBestMapper.toDto(entry.getValue())
-                ));
-    }
-
-    public List<PersonalBestDto> getPersonalBestDtosAsList(String mode) {
-        List<PersonalBest> bps = getPersonalBestsAsList(mode);
-        return personalBestMapper.toDto(bps);
-    }
-
-    public Map<String, List<PersonalBest>> getPersonalBests(String mode) {
-        URI uri = UriBuilder.fromPath("/users/personalBests")
-                .queryParam("mode", mode)
-                .build();
-        return exchangeService.makeGetRequest(uri, MAP_OF_RECORDS_REF);
-    }
-
-    public List<PersonalBest> getPersonalBestsAsList(String mode) {
-        Map<String, List<PersonalBest>> response = getPersonalBests(mode);
-        return response.entrySet()
-                .stream()
-                .map(entry -> {
-                    String mode2 = entry.getKey();
-                    entry.getValue()
-                            .forEach(pb -> {
-                                pb.setMode(mode);
-                                pb.setMode2(mode2);
-                                if (pb.getNumbers() == null) {
-                                    pb.setNumbers(false);
-                                }
-                                if (pb.getPunctuation() == null) {
-                                    pb.setPunctuation(false);
-                                }
-                            });
-                    return entry;
-                })
-                .flatMap(entry -> entry.getValue().stream())
-                .toList();
-    }
-
-    @Transactional
-    public void getAndSavePersonalBests() {
-        List<PersonalBest> timeBests = getPersonalBestsAsList("time");
-        List<PersonalBest> wordsBests = getPersonalBestsAsList("words");
-        for (PersonalBest personalBest : timeBests) {
-            personalBestRepository.upsert(personalBest);
-        }
-        for (PersonalBest personalBest : wordsBests) {
-            personalBestRepository.upsert(personalBest);
-        }
-    }
-
-    public List<PersonalBestDto> getPersonalBests(String mode, String mode2) {
+    public List<PersonalBestDto> getPersonalBests(String mode, String mode2, String language) {
         URI uri = UriBuilder.fromPath("/users/personalBests")
                 .queryParam("mode", mode)
                 .queryParam("mode2", mode2)
                 .build();
-        List<PersonalBest> response = exchangeService.makeGetRequest(uri, LIST_OF_RECORDS);
-        return personalBestMapper.toDto(response);
+        return exchangeService.makeGetRequest(uri, LIST_OF_RECORDS)
+                .stream()
+                .map(pb -> {
+                            PersonalBest newPb = processPersonalBest(pb, mode, mode2);
+                            return personalBestMapper.toDto(newPb);
+                        }
+                )
+                .filter(pb -> pb.getLanguage().contains(language))
+                .toList();
+    }
+
+    public List<PersonalBest> getAllPersonalBests(String language) {
+        URI timeModeUri = UriBuilder.fromPath("/users/personalBests")
+                .queryParam("mode", "time")
+                .build();
+        Map<String, List<PersonalBest>> timePbs = exchangeService.makeGetRequest(timeModeUri, MAP_OF_RECORDS_REF);
+
+        URI wordsModeUri = UriBuilder.fromPath("/users/personalBests")
+                .queryParam("mode", "words")
+                .build();
+        Map<String, List<PersonalBest>> wordsPbs = exchangeService.makeGetRequest(wordsModeUri, MAP_OF_RECORDS_REF);
+
+        List<PersonalBest> allPbs = new ArrayList<>(timePbs.size() + wordsPbs.size());
+
+        timePbs.forEach((k, v) -> {
+            v.stream().map(pb -> processPersonalBest(pb, "time", k))
+                    .filter(pb -> pb.getLanguage().contains(language))
+                    .forEach(allPbs::add);
+        });
+        wordsPbs.forEach((k, v) -> {
+            v.stream().map(pb -> processPersonalBest(pb, "words", k))
+                    .filter(pb -> pb.getLanguage().contains(language))
+                    .forEach(allPbs::add);
+        });
+
+        return allPbs;
+    }
+
+    public List<PersonalBestDto> getAllPersonalBestDtos(String language) {
+        List<PersonalBest> allPbs = getAllPersonalBests(language);
+        return personalBestMapper.toDto(allPbs);
+    }
+
+    private PersonalBest processPersonalBest(PersonalBest personalBest,
+                                             String mode, String mode2) {
+        personalBest.setMode(mode);
+        personalBest.setMode2(mode2);
+        if (personalBest.getNumbers() == null) {
+            personalBest.setNumbers(false);
+        }
+        if (personalBest.getPunctuation() == null) {
+            personalBest.setPunctuation(false);
+        }
+        return personalBest;
+    }
+
+    @Transactional
+    public void savePersonalBests(String language) {
+        List<PersonalBest> pbs = getAllPersonalBests(language);
+        for (PersonalBest personalBest : pbs) {
+            personalBestRepository.upsert(personalBest);
+        }
     }
 
     public UserStats getUserStats() {

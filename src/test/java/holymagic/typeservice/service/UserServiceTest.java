@@ -67,25 +67,26 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getPersonalBestsForTimeModeTest() {
-        URI expectedUri = URI.create("/users/personalBests?mode=time");
-        Map<String, List<PersonalBest>> records = UserServiceTestData.providePersonalBestsForTimeMode();
-        Map<String, List<PersonalBestDto>> expectedRecords = UserServiceTestData.providePersonalBestDtosForTimeMode(records);
-        when(exchangeService.makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF))).thenReturn(records);
-        Map<String, List<PersonalBestDto>> actualRecords = userService.getPersonalBestDtos("time");
-        assertEquals(expectedRecords, actualRecords);
-        verifyExchange(expectedUri, MAP_OF_RECORDS_REF);
+    public void getPersonalBestTest() {
+        List<PersonalBest> pbs = UserServiceTestData.generatePersonalBests();
+        URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=60");
+        when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(pbs);
+        List<PersonalBestDto> result = userService.getPersonalBests("time", "60", "english");
+        verifyExchange(expectedUri, LIST_OF_RECORDS);
+        assertEquals(5, result.size());
     }
 
     @Test
-    public void getPersonalBestForSpecificTimeModeTest() {
-        URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=30");
-        List<PersonalBest> records = UserServiceTestData.generatePersonalBests();
-        when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(records);
-        List<PersonalBestDto> actualRecords = userService.getPersonalBests("time", "30");
-        List<PersonalBestDto> expectedRecords = personalBestMapper.toDto(records);
-        assertEquals(expectedRecords, actualRecords);
-        verifyExchange(expectedUri, LIST_OF_RECORDS);
+    public void getAllPersonalBestsTest() {
+        Map<String, List<PersonalBest>> timePbs = UserServiceTestData.provideMapOfPersonalBest();
+        Map<String, List<PersonalBest>> wordsPbs = UserServiceTestData.provideMapOfPersonalBest();
+        URI expectedUriForTimeMode = URI.create("/users/personalBests?mode=time");
+        URI expectedUriForWordsMode = URI.create("/users/personalBests?mode=words");
+        when(exchangeService.makeGetRequest(eq(expectedUriForTimeMode), eq(MAP_OF_RECORDS_REF))).thenReturn(timePbs);
+        when(exchangeService.makeGetRequest(eq(expectedUriForWordsMode), eq(MAP_OF_RECORDS_REF))).thenReturn(wordsPbs);
+        List<PersonalBestDto> result = userService.getAllPersonalBestDtos("english");
+        verify(exchangeService, times(2)).makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF));
+        assertEquals(40, result.size());
     }
 
     @Test
