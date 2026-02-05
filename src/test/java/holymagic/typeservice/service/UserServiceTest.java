@@ -6,7 +6,6 @@ import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
-import holymagic.typeservice.model.ParameterizedTypeReferences;
 import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
