@@ -1,6 +1,8 @@
 package holymagic.typeservice.service.excel;
 
 import holymagic.typeservice.dto.RaceDto;
+import holymagic.typeservice.dto.ResultDto;
+import holymagic.typeservice.model.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -10,14 +12,14 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-public class ResultExcelService extends AbstractExcelService<RaceDto> {
+public class ResultExcelService extends AbstractExcelService<ResultDto> {
 
     public ResultExcelService() {
         super();
     }
 
     @Override
-    public void writeToRow(Row row, RaceDto dto) {
+    public void writeToRow(Row row, ResultDto dto) {
         Cell[] cells = new Cell[8];
         for (int i = 0; i < 8; i++) {
             cells[i] = row.createCell(i);
@@ -33,8 +35,8 @@ public class ResultExcelService extends AbstractExcelService<RaceDto> {
     }
 
     @Override
-    public RaceDto readFromRow(Row row) {
-        return RaceDto.builder()
+    public ResultDto readFromRow(Row row) {
+        return ResultDto.builder()
                 .id(row.getCell(0).getStringCellValue())
                 .chars((int) row.getCell(1).getNumericCellValue())
                 .speed(row.getCell(2).getNumericCellValue())

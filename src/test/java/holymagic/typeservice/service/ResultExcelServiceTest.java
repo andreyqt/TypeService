@@ -1,6 +1,6 @@
 package holymagic.typeservice.service;
 
-import holymagic.typeservice.dto.RaceDto;
+import holymagic.typeservice.dto.ResultDto;
 import holymagic.typeservice.service.excel.ResultExcelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ResultExcelServiceTest {
 
     private ResultExcelService excelService;
-    private RaceDto raceDto;
-    private String testFilePath;
+    private ResultDto resultDto;
+    private String readFilePath;
+    private String writeFilePath;
 
     @BeforeEach
     public void setUp() {
         excelService = new ResultExcelService();
-        testFilePath = "C:\\Users\\User\\Documents\\MTT\\TS_test.xlsx";
-        raceDto = RaceDto.builder()
+        readFilePath = "C:\\Users\\User\\Documents\\MTT\\TS_test_read.xlsx";
+        writeFilePath = "C:\\Users\\User\\Documents\\MTT\\TS_test_write.xlsx";
+        resultDto = ResultDto.builder()
                 .id("1s23")
                 .chars(400)
                 .accuracy(100.)
@@ -37,19 +39,19 @@ public class ResultExcelServiceTest {
 
     @Test
     public void readTest() {
-        List<RaceDto> result = excelService.read(testFilePath);
+        List<ResultDto> result = excelService.read(readFilePath);
         assertEquals(5, result.size());
-        assertEquals(raceDto, result.getFirst());
+        assertEquals(resultDto, result.getFirst());
     }
 
     @Test
     public void writeTest() {
-        excelService.write(raceDto, testFilePath);
+        excelService.write(resultDto, writeFilePath);
     }
 
     @Test
     public void writeListTest() {
-        excelService.write(List.of(raceDto, raceDto, raceDto), testFilePath);
+        excelService.write(List.of(resultDto, resultDto, resultDto), writeFilePath);
     }
 
 }
