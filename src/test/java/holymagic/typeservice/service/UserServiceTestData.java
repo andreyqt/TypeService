@@ -1,8 +1,5 @@
 package holymagic.typeservice.service;
 
-import holymagic.typeservice.dto.PersonalBestDto;
-import holymagic.typeservice.mapper.PersonalBestMapper;
-import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
@@ -16,24 +13,13 @@ import java.util.Map;
 
 public class UserServiceTestData {
 
-    public static Map<String, List<PersonalBest>> providePersonalBestsForTimeMode() {
+    public static Map<String, List<PersonalBest>> provideMapOfPersonalBest() {
         Map<String, List<PersonalBest>> records = new HashMap<>();
         records.put("15", generatePersonalBests());
         records.put("30", generatePersonalBests());
         records.put("60", generatePersonalBests());
         records.put("120", generatePersonalBests());
         return records;
-    }
-
-    public static Map<String, List<PersonalBestDto>> providePersonalBestDtosForTimeMode(
-            Map<String, List<PersonalBest>> records
-    ) {
-        PersonalBestMapper mapper = new PersonalBestMapperImpl();
-        Map<String, List<PersonalBestDto>> personalBests = new HashMap<>();
-        for (Map.Entry<String, List<PersonalBest>> entry : records.entrySet()) {
-            personalBests.put(entry.getKey(), mapper.toDto(entry.getValue()));
-        }
-        return personalBests;
     }
 
     public static List<PersonalBest> generatePersonalBests() {
@@ -69,7 +55,7 @@ public class UserServiceTestData {
                 .uid("test_id_123")
                 .addedAt(1643738836457L)
                 .typingStats(provideUserStats())
-                .personalBests(Map.of("time", providePersonalBestsForTimeMode()))
+                .personalBests(Map.of("time", provideMapOfPersonalBest()))
                 .xp(23085486)
                 .streak(471)
                 .maxStreak(471)

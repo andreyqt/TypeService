@@ -1,10 +1,13 @@
 package holymagic.typeservice.service;
 
 import holymagic.typeservice.dto.CurrentTestActivityDto;
+import holymagic.typeservice.dto.PersonalBestDto;
 import holymagic.typeservice.dto.StreakDto;
 import holymagic.typeservice.mapper.CurrentTestActivityMapper;
 import holymagic.typeservice.mapper.PersonalBestMapperImpl;
 import holymagic.typeservice.mapper.StreakMapper;
+import holymagic.typeservice.model.ParameterizedTypeReferences;
+import holymagic.typeservice.model.race.PersonalBest;
 import holymagic.typeservice.model.user.CheckName;
 import holymagic.typeservice.model.user.CurrentTestActivity;
 import holymagic.typeservice.model.user.Profile;
@@ -20,9 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CHECK_NAME_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.CURRENT_TEST_ACTIVITY_REF;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.LIST_OF_RECORDS;
+import static holymagic.typeservice.model.ParameterizedTypeReferences.MAP_OF_RECORDS_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.PROFILE_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.STREAK_REF;
 import static holymagic.typeservice.model.ParameterizedTypeReferences.USER_STATS_REF;
@@ -60,6 +67,28 @@ public class UserServiceTest {
         verifyExchange(expectedUri, CHECK_NAME_REF);
     }
 
+    @Test
+    public void getPersonalBestTest() {
+        List<PersonalBest> pbs = UserServiceTestData.generatePersonalBests();
+        URI expectedUri = URI.create("/users/personalBests?mode=time&mode2=60");
+        when(exchangeService.makeGetRequest(any(URI.class), eq(LIST_OF_RECORDS))).thenReturn(pbs);
+        List<PersonalBestDto> result = userService.getPersonalBests("time", "60", "english");
+        verifyExchange(expectedUri, LIST_OF_RECORDS);
+        assertEquals(5, result.size());
+    }
+
+    @Test
+    public void getAllPersonalBestsTest() {
+        Map<String, List<PersonalBest>> timePbs = UserServiceTestData.provideMapOfPersonalBest();
+        Map<String, List<PersonalBest>> wordsPbs = UserServiceTestData.provideMapOfPersonalBest();
+        URI expectedUriForTimeMode = URI.create("/users/personalBests?mode=time");
+        URI expectedUriForWordsMode = URI.create("/users/personalBests?mode=words");
+        when(exchangeService.makeGetRequest(eq(expectedUriForTimeMode), eq(MAP_OF_RECORDS_REF))).thenReturn(timePbs);
+        when(exchangeService.makeGetRequest(eq(expectedUriForWordsMode), eq(MAP_OF_RECORDS_REF))).thenReturn(wordsPbs);
+        List<PersonalBestDto> result = userService.getAllPersonalBestDtos("english");
+        verify(exchangeService, times(2)).makeGetRequest(any(URI.class), eq(MAP_OF_RECORDS_REF));
+        assertEquals(40, result.size());
+    }
 
     @Test
     public void getUserStatsTest() {
