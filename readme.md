@@ -5,7 +5,7 @@ TypeService - приложение для получения данных с [mo
 В целом, реализованы почти все методы [monkeytype API](https://api.monkeytype.com/docs) из разделов:
 
 * [user](/src/main/java/holymagic/typeservice/controller/UserController.java);
-* [test results](/src/main/java/holymagic/typeservice/controller/RaceController.java);
+* [test results](/src/main/java/holymagic/typeservice/controller/ResultController.java);
 * [public](/src/main/java/holymagic/typeservice/controller/PublicDataController.java);
 * [leaderboards](/src/main/java/holymagic/typeservice/controller/LeaderboardController.java).
 
