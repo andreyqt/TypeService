@@ -40,7 +40,9 @@ public class LeaderboardService {
     }
 
     public RankingDto getRank(String language, String mode, String mode2, boolean friendsOnly) {
-        URI uri = provideUri("/leaderboards/rank", language, mode, mode2, friendsOnly);
+        URI uri = UriBuilder.fromPath("/leaderboards/rank")
+                .queryParam("language", language).queryParam("mode", mode).queryParam("mode2", mode2)
+                .queryParam("friendsOnly", friendsOnly).build();
         Ranking ranking = exchangeService.makeGetRequest(uri, RANKING_RACE_REF);
         return rankingMapper.toDto(ranking);
     }
