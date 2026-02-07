@@ -28,15 +28,22 @@ public class LeaderboardRequestValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"russian", "spanish", "french"})
-    @DisplayName("throws exception for not allowed languages for global leaderboards")
+    @DisplayName("throws exception for not allowed languages for global lbs")
     public void validateNotallowedLanguages(String language) {
         assertThrows(ParamValidationException.class, () -> validator.validateGlobalLanguage(language));
     }
 
     @Test
     @DisplayName("validates language successfully")
-    public void validateGlobalLanguage() {
+    public void validateGlobalLanguages() {
         assertDoesNotThrow(() -> validator.validateGlobalLanguage("english"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"english", "french", "german", "indonesian", "italian", "portuguese", "spanish"})
+    @DisplayName("valides allowed languages for daily lbs")
+    public void validateDailyLanguages(String language) {
+        assertDoesNotThrow(() -> validator.validateDailyLanguage(language));
     }
 
     @ParameterizedTest

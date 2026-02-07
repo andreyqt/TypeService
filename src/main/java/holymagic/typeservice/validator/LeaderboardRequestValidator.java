@@ -34,7 +34,7 @@ public class LeaderboardRequestValidator {
         }
     }
 
-    public void validateLocalLanguage(String language) {
+    public void validateDailyLanguage(String language) {
         if(!DAILY_ALLOWED_LANGUAGES.contains(language)) {
             throw new ParamValidationException("Language is not valid for local lbs: " + language);
         }
