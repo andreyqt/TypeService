@@ -1,6 +1,5 @@
 package holymagic.typeservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RaceDto {
-    private String id;
-    private String uid;
-    private Integer chars;
+public class RankingDto {
     private Double speed;
     private Double accuracy;
-    private String mode;
-    private String mode2;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime localDateTime;
-    private Double testDuration;
+    private String uid;
+    private String name;
+    private String discordId;
+    private Integer rank;
 }

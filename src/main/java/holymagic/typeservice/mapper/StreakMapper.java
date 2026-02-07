@@ -13,7 +13,9 @@ import java.time.ZoneId;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface StreakMapper {
-    @Mapping(source = "lastResultTimestamp", target = "lastResultTimestamp", qualifiedByName = "mapLongToLocalDateTime")
+
+    @Mapping(source = "lastResultTimestamp", target = "lastResultTimestamp",
+            qualifiedByName = "mapLongToLocalDateTime")
     StreakDto ToDto(Streak streak);
 
     @Named("mapLongToLocalDateTime")
@@ -21,4 +23,5 @@ public interface StreakMapper {
         Instant instant = Instant.ofEpochMilli(timestamp);
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
+
 }

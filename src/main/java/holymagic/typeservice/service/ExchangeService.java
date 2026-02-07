@@ -24,6 +24,13 @@ public class ExchangeService {
         return response.getData();
     }
 
+    public String makeGetRequest(URI uri) {
+        return restClient.get()
+                .uri(uri)
+                .retrieve()
+                .body(String.class);
+    }
+
     private <T> void validateResponse(Response<T> response) {
         if (response.getData() == null) {
             throw new DataValidationException("Response data is null");

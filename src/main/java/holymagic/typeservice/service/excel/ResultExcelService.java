@@ -1,8 +1,6 @@
 package holymagic.typeservice.service.excel;
 
-import holymagic.typeservice.dto.RaceDto;
 import holymagic.typeservice.dto.ResultDto;
-import holymagic.typeservice.model.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;

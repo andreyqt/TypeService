@@ -1,7 +1,7 @@
 package holymagic.typeservice.model;
 
 import holymagic.typeservice.model.leaderboard.Leaderboard;
-import holymagic.typeservice.model.leaderboard.RankedRace;
+import holymagic.typeservice.model.leaderboard.Ranking;
 import holymagic.typeservice.model.leaderboard.XpLeaderboard;
 import holymagic.typeservice.model.publicData.TypingStats;
 import holymagic.typeservice.model.result.Result;
@@ -54,7 +54,7 @@ public class ParameterizedTypeReferences {
     public static final ParameterizedTypeReference<Response<Leaderboard>> LEADERBOARD_REF =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<Response<RankedRace>> RANKED_RACE_REF =
+    public static final ParameterizedTypeReference<Response<Ranking>> RANKING_RACE_REF =
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Response<XpLeaderboard>> XP_LEADERBOARD_REF =
