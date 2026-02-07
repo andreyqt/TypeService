@@ -28,9 +28,15 @@ public class LeaderboardRequestValidator {
             "spanish"
     );
 
-    public void validateLanguage(String language) {
+    public void validateGlobalLanguage(String language) {
         if (!GLOBAL_ALLOWED_LANGUAGES.contains(language)) {
-            throw new ParamValidationException("Language is not valid: " + language);
+            throw new ParamValidationException("Language is not valid for global lbs: " + language);
+        }
+    }
+
+    public void validateLocalLanguage(String language) {
+        if(!DAILY_ALLOWED_LANGUAGES.contains(language)) {
+            throw new ParamValidationException("Language is not valid for local lbs: " + language);
         }
     }
 

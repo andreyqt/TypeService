@@ -14,7 +14,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface WeeklyActivityMapper {
-    @Mapping(source = "lastActivityTimestamp", target = "lastActivityTimestamp", qualifiedByName = "mapLongToLocalDateTime")
+
+    @Mapping(source = "lastActivityTimestamp", target = "lastActivityTimestamp",
+            qualifiedByName = "mapLongToLocalDateTime")
     WeeklyActivityDto toDto(WeeklyActivity weeklyActivity);
 
     @Named("mapLongToLocalDateTime")
@@ -26,4 +28,5 @@ public interface WeeklyActivityMapper {
     default List<WeeklyActivityDto> toDto(List<WeeklyActivity> weeklyActivities) {
         return weeklyActivities.stream().map(this::toDto).toList();
     }
+
 }

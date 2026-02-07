@@ -29,7 +29,7 @@ public class LeaderboardController {
             @RequestParam(required = false, defaultValue = "time") String mode,
             @RequestParam(required = false, defaultValue = "60") String mode2,
             @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
-        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateGlobalLanguage(language);
         leaderboardRequestValidator.validateModes(mode, mode2);
         return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, friendsOnly));
     }
@@ -41,7 +41,7 @@ public class LeaderboardController {
             @RequestParam(required = false, defaultValue = "time") String mode,
             @RequestParam(required = false, defaultValue = "60") String mode2,
             @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
-        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateGlobalLanguage(language);
         leaderboardRequestValidator.validateModes(mode, mode2);
         return ResponseEntity.ok(leaderboardService.getRank(language, mode, mode2, friendsOnly));
     }
@@ -53,7 +53,7 @@ public class LeaderboardController {
             @RequestParam(required = false, defaultValue = "time") String mode,
             @RequestParam(required = false, defaultValue = "60") String mode2,
             @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
-        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateGlobalLanguage(language);
         leaderboardRequestValidator.validateModes(mode, mode2);
         return ResponseEntity.ok(leaderboardService.getDailyLeaderboard(language, mode, mode2, friendsOnly));
     }
