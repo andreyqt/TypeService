@@ -2,6 +2,7 @@ package holymagic.typeservice.controller;
 
 import holymagic.typeservice.model.publicData.TypingStats;
 import holymagic.typeservice.service.PublicDataService;
+import holymagic.typeservice.validator.PublicDataRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,22 @@ import java.util.Map;
 public class PublicDataController {
 
     private final PublicDataService publicDataService;
+    private final PublicDataRequestValidator publicDataRequestValidator;
+
 
     @Operation(summary = "gets number of users personal bests grouped by wpm level (multiples of ten)")
     @GetMapping("/speedHistogram")
-    public ResponseEntity<Map<String, Integer>> getSpeedHistogram(@RequestParam String language,
-                                                                @RequestParam String mode,
-                                                                @RequestParam String mode2) {
-        return ResponseEntity.ok(publicDataService.getSpeedHistogram(language, mode, mode2));
+    public ResponseEntity<Map<String, Integer>> getSpeedHistogram(
+            @RequestParam(required = false, defaultValue = "time") String mode,
+            @RequestParam(required = false, defaultValue = "60") String mode2) {
+        publicDataRequestValidator.validateModeCombination(mode, mode2);
+        return ResponseEntity.ok(publicDataService.getSpeedHistogram(mode, mode2));
     }
 
-    @Operation(summary = "gets number of tests and time users spend typing")
+    @Operation(summary = "Gets number of tests and time users spend typing")
     @GetMapping("/typingStats")
     public ResponseEntity<TypingStats> getTypingStats() {
         return ResponseEntity.ok(publicDataService.getTypingStats());
     }
+
 }
