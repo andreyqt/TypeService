@@ -67,7 +67,7 @@ public class LeaderboardServiceTestData {
     public static final URI EXPECTED_GET_LBS_URI =
             URI.create("/leaderboards?language=english&mode=time&pageSize=5&mode2=60&friendsOnly=false");
     public static final URI EXPECTED_GET_RANK_URI =
-            URI.create("/leaderboards/rank?language=english&mode=time&pageSize=5&mode2=60&friendsOnly=false");
+            URI.create("/leaderboards/rank?language=english&mode=time&mode2=60&friendsOnly=false");
     public static final URI EXPECTED_GET_DAILY_LBS_URI =
             URI.create("/leaderboards/daily?language=english&mode=time&pageSize=5&mode2=60&friendsOnly=false");
     public static final URI EXPECTED_GET_WEEKLY_XP_URI =

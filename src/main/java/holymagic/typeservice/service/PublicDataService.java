@@ -17,11 +17,10 @@ public class PublicDataService {
 
     private final ExchangeService exchangeService;
 
-    public Map<String, Integer> getSpeedHistogram(String language, String mode, String mode2) {
+    public Map<String, Integer> getSpeedHistogram(String mode, String mode2) {
         URI uri = UriBuilder.fromPath("/public/speedHistogram")
-                .queryParam("language", language)
-                .queryParam("mode", mode)
-                .queryParam("mode2", mode2)
+                .queryParam("language", "english")
+                .queryParam("mode", mode).queryParam("mode2", mode2)
                 .build();
         return exchangeService.makeGetRequest(uri, SPEED_HISTOGRAM_REF);
     }
@@ -31,6 +30,5 @@ public class PublicDataService {
                 .build();
         return exchangeService.makeGetRequest(uri, TYPING_STATS_REF);
     }
-
 
 }
