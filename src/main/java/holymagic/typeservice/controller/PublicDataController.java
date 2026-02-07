@@ -26,7 +26,6 @@ public class PublicDataController {
     public ResponseEntity<Map<String, Integer>> getSpeedHistogram(@RequestParam String language,
                                                                 @RequestParam String mode,
                                                                 @RequestParam String mode2) {
-        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, null, null);
         return ResponseEntity.ok(publicDataService.getSpeedHistogram(language, mode, mode2));
     }
 

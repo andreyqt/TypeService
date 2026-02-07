@@ -11,5 +11,5 @@ import java.util.List;
 @NoArgsConstructor
 public class Leaderboard {
     private Integer count;
-    private List<RankedRace> entries;
+    private List<Ranking> entries;
 }

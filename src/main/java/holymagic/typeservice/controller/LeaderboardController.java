@@ -1,6 +1,6 @@
 package holymagic.typeservice.controller;
 
-import holymagic.typeservice.dto.RankedRaceDto;
+import holymagic.typeservice.dto.RankingDto;
 import holymagic.typeservice.dto.WeeklyActivityDto;
 import holymagic.typeservice.service.LeaderboardService;
 import holymagic.typeservice.validator.LeaderboardRequestValidator;
@@ -20,51 +20,49 @@ import java.util.List;
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
-    private final LeaderboardRequestValidator validator;
+    private final LeaderboardRequestValidator leaderboardRequestValidator;
 
     @Operation(summary = "Gets all-time leaderboard")
     @GetMapping("/")
-    public ResponseEntity<List<RankedRaceDto>> getLeaderboard(@RequestParam String language,
-                                                              @RequestParam String mode,
-                                                              @RequestParam String mode2,
-                                                              @RequestParam(required = false) Integer page,
-                                                              @RequestParam(required = false) Integer pageSize,
-                                                              @RequestParam(required = false) Boolean friendsOnly) {
-        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, page, pageSize);
-        return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, page, pageSize, friendsOnly));
+    public ResponseEntity<List<RankingDto>> getLeaderboard(
+            @RequestParam(required = false, defaultValue = "english") String language,
+            @RequestParam(required = false, defaultValue = "time") String mode,
+            @RequestParam(required = false, defaultValue = "60") String mode2,
+            @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
+        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateModes(mode, mode2);
+        return ResponseEntity.ok(leaderboardService.getLeaderboard(language, mode, mode2, friendsOnly));
     }
 
     @Operation(summary = "Gets the rank of the current user on the all-time leaderboard")
     @GetMapping("/rank")
-    public ResponseEntity<RankedRaceDto> getRank(@RequestParam String language,
-                                                 @RequestParam String mode,
-                                                 @RequestParam String mode2,
-                                                 @RequestParam(required = false) Boolean friendsOnly) {
-        validator.ValidateGlobalLeaderboardArgs(language, mode, mode2, null, null);
+    public ResponseEntity<RankingDto> getRank(
+            @RequestParam(required = false, defaultValue = "english") String language,
+            @RequestParam(required = false, defaultValue = "time") String mode,
+            @RequestParam(required = false, defaultValue = "60") String mode2,
+            @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
+        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateModes(mode, mode2);
         return ResponseEntity.ok(leaderboardService.getRank(language, mode, mode2, friendsOnly));
     }
 
     @Operation(summary = "Gets daily leaderboard")
     @GetMapping("/daily")
-    public ResponseEntity<List<RankedRaceDto>> getDailyLeaderboard(@RequestParam String language,
-                                                                   @RequestParam String mode,
-                                                                   @RequestParam String mode2,
-                                                                   @RequestParam(required = false) Integer page,
-                                                                   @RequestParam(required = false) Integer pageSize,
-                                                                   @RequestParam(required = false) Boolean friendsOnly) {
-        validator.validateDailyLeaderboardArgs(language, mode, mode2, page, pageSize);
-        return ResponseEntity.ok(leaderboardService.getDailyLeaderboard(language, mode, mode2,
-                page, pageSize, friendsOnly));
+    public ResponseEntity<List<RankingDto>> getDailyLeaderboard(
+            @RequestParam(required = false, defaultValue = "english") String language,
+            @RequestParam(required = false, defaultValue = "time") String mode,
+            @RequestParam(required = false, defaultValue = "60") String mode2,
+            @RequestParam(required = false, defaultValue = "false") boolean friendsOnly) {
+        leaderboardRequestValidator.validateLanguage(language);
+        leaderboardRequestValidator.validateModes(mode, mode2);
+        return ResponseEntity.ok(leaderboardService.getDailyLeaderboard(language, mode, mode2, friendsOnly));
     }
 
     @Operation(summary = "Gets weekly xp leaderboard")
     @GetMapping("/xp/weekly")
-    public ResponseEntity<List<WeeklyActivityDto>> getWeeklyXpLeaderboard(@RequestParam(required = false) Integer page,
-                                                                          @RequestParam(required = false) Integer pageSize,
-                                                                          @RequestParam(required = false) Boolean friendsOnly) {
-        validator.validatePage(page);
-        validator.validatePageSize(pageSize);
-        return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly, page, pageSize));
+    public ResponseEntity<List<WeeklyActivityDto>> getWeeklyXpLeaderboard(
+            @RequestParam(required = false, defaultValue = "false") Boolean friendsOnly) {
+        return ResponseEntity.ok(leaderboardService.getWeeklyXpLeaderboard(friendsOnly));
     }
 
 }

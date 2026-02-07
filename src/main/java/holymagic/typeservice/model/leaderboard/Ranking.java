@@ -6,18 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class WeeklyActivity {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Ranking {
+    private Integer rank;
     private String uid;
+    private Double wpm;
+    private Double acc;
+    private Long timestamp;
+    private Double raw;
+    private Double consistency;
     private String name;
-    private Long lastActivityTimestamp;
-    private Double timeTypedSeconds;
     private String discordId;
     private String discordAvatar;
-    private Long badgeId;
-    private Integer rank;
-    private Integer totalXp;
     private Integer friendsRank;
 }
