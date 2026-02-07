@@ -2,7 +2,6 @@ package holymagic.typeservice.controller;
 
 import holymagic.typeservice.model.publicData.TypingStats;
 import holymagic.typeservice.service.PublicDataService;
-import holymagic.typeservice.validator.LeaderboardRequestValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
