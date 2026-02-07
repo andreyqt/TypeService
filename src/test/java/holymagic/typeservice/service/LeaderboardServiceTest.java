@@ -29,7 +29,6 @@ import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_
 import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_LBS_URI;
 import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_RANK_URI;
 import static holymagic.typeservice.service.LeaderboardServiceTestData.EXPECTED_GET_WEEKLY_XP_URI;
-import static holymagic.typeservice.service.LeaderboardServiceTestData.provideXpLeaderboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

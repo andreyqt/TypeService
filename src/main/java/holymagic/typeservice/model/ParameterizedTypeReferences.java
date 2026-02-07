@@ -57,9 +57,6 @@ public class ParameterizedTypeReferences {
     public static final ParameterizedTypeReference<Response<Ranking>> RANKING_RACE_REF =
             new ParameterizedTypeReference<>() {};
 
-    public static final ParameterizedTypeReference<List<Ranking>> RANKING_LIST_REF =
-            new ParameterizedTypeReference<>() {};
-
     public static final ParameterizedTypeReference<Response<XpLeaderboard>> XP_LEADERBOARD_REF =
             new ParameterizedTypeReference<>() {};
 }

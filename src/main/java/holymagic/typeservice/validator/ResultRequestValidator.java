@@ -1,6 +1,5 @@
 package holymagic.typeservice.validator;
 
-import holymagic.typeservice.exception.DataValidationException;
 import holymagic.typeservice.exception.ParamValidationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -35,6 +35,6 @@ public class LeaderboardRequestValidatorTest {
         assertDoesNotThrow(() -> validator.validateLanguage("english"));
     }
 
-    public
+
 
 }

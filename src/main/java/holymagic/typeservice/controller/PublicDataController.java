@@ -19,7 +19,6 @@ import java.util.Map;
 public class PublicDataController {
 
     private final PublicDataService publicDataService;
-    private final LeaderboardRequestValidator validator;
 
     @Operation(summary = "gets number of users personal bests grouped by wpm level (multiples of ten)")
     @GetMapping("/speedHistogram")
